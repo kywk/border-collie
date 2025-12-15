@@ -1,0 +1,462 @@
+/* =============================================
+   BorderCollie - Design System
+   ============================================= */
+
+/* CSS Variables - Dark Theme (Default) */
+:root {
+  --color-bg-primary: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-bg-tertiary: #334155;
+  --color-bg-hover: #475569;
+
+  --color-text-primary: #f1f5f9;
+  --color-text-secondary: #94a3b8;
+  --color-text-muted: #64748b;
+
+  --color-border: #334155;
+  --color-border-focus: #60a5fa;
+
+  --color-accent: #3b82f6;
+  --color-accent-hover: #2563eb;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* Gantt Chart Project Colors */
+  --gantt-color-1: hsl(210, 60%, 65%);
+  --gantt-color-2: hsl(150, 50%, 55%);
+  --gantt-color-3: hsl(30, 65%, 60%);
+  --gantt-color-4: hsl(280, 45%, 65%);
+  --gantt-color-5: hsl(350, 55%, 65%);
+  --gantt-color-6: hsl(180, 50%, 55%);
+  --gantt-color-7: hsl(60, 55%, 55%);
+  --gantt-color-8: hsl(320, 50%, 60%);
+
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+
+  /* Spacing */
+  --spacing-xs: 0.25rem;
+  --spacing-sm: 0.5rem;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+  --spacing-2xl: 3rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --color-bg-primary: #f1f5f9;
+  /* Slightly darker background to reduce glare */
+  --color-bg-secondary: #ffffff;
+  /* Panels remain white for card effect */
+  --color-bg-tertiary: #e2e8f0;
+  /* Headers slightly darker */
+  --color-bg-hover: #cbd5e1;
+
+  --color-text-primary: #020617;
+  /* Almost black for primary text */
+  --color-text-secondary: #334155;
+  /* Darker slate for secondary text */
+  --color-text-muted: #64748b;
+
+  --color-border: #cbd5e1;
+  /* Darker borders for definition */
+  --color-border-focus: #2563eb;
+
+  --color-accent: #2563eb;
+  --color-accent-hover: #1d4ed8;
+
+  /* Gantt colors slightly more saturated for light theme */
+  --gantt-color-1: hsl(210, 70%, 50%);
+  --gantt-color-2: hsl(150, 60%, 45%);
+  --gantt-color-3: hsl(30, 75%, 50%);
+  --gantt-color-4: hsl(280, 55%, 55%);
+  --gantt-color-5: hsl(350, 65%, 55%);
+  --gantt-color-6: hsl(180, 60%, 45%);
+  --gantt-color-7: hsl(60, 65%, 45%);
+  --gantt-color-8: hsl(320, 60%, 50%);
+}
+
+/* Reset & Base */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-size: 16px;
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg-primary);
+}
+
+/* App Layout - Full Height */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Panel Base */
+.panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  height: 100%;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.panel-content {
+  flex: 1;
+  overflow: auto;
+  padding: var(--spacing-md);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-primary {
+  background: var(--color-accent);
+  color: white;
+}
+
+.btn-primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-text-secondary);
+}
+
+.btn-ghost:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.btn-ghost.active {
+  background: var(--color-accent);
+  color: white;
+}
+
+/* Toggle Group */
+.toggle-group {
+  display: inline-flex;
+  background: var(--color-bg-primary);
+  border-radius: var(--radius-md);
+  padding: 2px;
+}
+
+.toggle-group .btn {
+  border-radius: calc(var(--radius-md) - 2px);
+}
+
+/* Editor Area */
+.editor-textarea {
+  width: 100%;
+  height: 100%;
+  min-height: 200px;
+  padding: var(--spacing-md);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  line-height: 1.7;
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  resize: none;
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.editor-textarea:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.data-table th,
+.data-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: left;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.data-table th {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-tertiary);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.data-table tr:hover td {
+  background: var(--color-bg-hover);
+}
+
+.data-table input {
+  width: 100%;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  background: var(--color-bg-primary);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.data-table input:focus {
+  border-color: var(--color-border-focus);
+}
+
+/* Gantt Chart */
+.gantt-container {
+  position: relative;
+  overflow: auto;
+}
+
+.gantt-header {
+  display: flex;
+  position: sticky;
+  top: 0;
+  background: var(--color-bg-tertiary);
+  z-index: 20;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.gantt-row {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 1px solid var(--color-border);
+  min-height: 40px;
+}
+
+.gantt-label {
+  flex-shrink: 0;
+  width: 120px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-weight: 500;
+  background: var(--color-bg-secondary);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+}
+
+.gantt-timeline {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.gantt-bar {
+  position: absolute;
+  height: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: opacity var(--transition-fast);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gantt-bar:hover {
+  filter: brightness(1.1);
+}
+
+/* Zoom Controls */
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.zoom-controls span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: var(--font-size-sm);
+  z-index: 100;
+  pointer-events: none;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-bg-hover);
+}
+
+/* Utility Classes */
+.flex {
+  display: flex;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.gap-sm {
+  gap: var(--spacing-sm);
+}
+
+.gap-md {
+  gap: var(--spacing-md);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  font-size: var(--font-size-lg);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.theme-toggle:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-border-focus);
+}
+
+/* Logo/Brand in Panel */
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  background: linear-gradient(135deg, var(--color-accent), #a78bfa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
