@@ -6,7 +6,7 @@ import { normalizeDate } from '@/parser/textParser'
 import type { PersonAssignment } from '@/types'
 
 const store = useProjectStore()
-const { months, totalWidth, getXPosition, getWidth, getProjectGradient } = useGanttScale()
+const { months, totalWidth, getXPosition, getWidth, getProjectGradient, getTodayPosition } = useGanttScale()
 
 // Tooltip 狀態
 const tooltip = ref<{
@@ -246,11 +246,22 @@ function getOpacity(percentage: number): number {
             v-for="month in months"
             :key="month.label"
             class="month-header"
+            :class="{ 
+              'year-even': month.isEvenYear,
+              'year-first': month.isFirstMonthOfYear 
+            }"
             :style="{ width: store.scale.monthWidth + 'px' }"
           >
-            {{ month.label }}
+            {{ month.shortLabel }}
           </div>
         </div>
+        
+        <!-- Today Indicator in Header (pin head) -->
+        <div 
+          v-if="getTodayPosition() >= 0"
+          class="today-header-indicator"
+          :style="{ left: (getTodayPosition() + 140) + 'px' }"
+        />
       </div>
 
       <!-- 人員群組 -->
@@ -334,6 +345,13 @@ function getOpacity(percentage: number): number {
           </div>
         </div>
       </div>
+      
+      <!-- Today Marker Line (Full Height) -->
+      <div 
+        v-if="getTodayPosition() >= 0"
+        class="today-marker-line"
+        :style="{ left: (getTodayPosition() + 140) + 'px' }"
+      />
     </div>
 
     <!-- Tooltip -->
@@ -533,6 +551,31 @@ function getOpacity(percentage: number): number {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 5;
   opacity: 1 !important;
+}
+
+/* Today Marker - Full Height Line */
+.today-marker-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #ef4444;
+  z-index: 10;
+  pointer-events: none;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+/* Today Header Indicator - Circle aligned with line */
+.today-header-indicator {
+  position: absolute;
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: #ef4444;
+  border-radius: 50%;
+  z-index: 25;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 
 .tooltip {

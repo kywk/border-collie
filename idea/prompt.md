@@ -103,7 +103,8 @@ Staff Portal:
 - **Glassmorphism**：面板標題使用毛玻璃效果（backdrop-filter: blur）
 - **漸層背景**：主背景使用微妙漸層
 - **甘特圖 Bar**：漸層填充、陰影、光澤效果（::before pseudo-element）
-- **今日標記線**：垂直線標示當日位置
+- **今日標記**：紅色大頭針設計，圓點在日期列，線條垂直貫穿整個甘特圖
+- **年度時間軸**：首月顯示完整年月，其他月份只顯示月，不同年度交替背景色
 - **微動畫**：按鈕 hover 浮起、Bar hover 放大、主題切換旋轉特效
 - **Pill 按鈕**：切換按鈕為膠囊形狀，active 狀態帶 glow
 
@@ -130,6 +131,8 @@ Staff Portal:
 4. ✅ 凍結窗格（Freeze Panes）- 日期列與專案欄固定
 5. ✅ UI 美化：Glassmorphism、漸層 Bar、今日標記線、微動畫
 6. ✅ LZ-String 壓縮替代 Gzip+Base64（URL 長度減少 10-15%）
+7. ✅ 年度時間軸格式：首月顯示完整年月，不同年度交替背景
+8. ✅ Today Marker 大頭針設計：紅色圓點 + 垂直線貫穿整個甘特圖
 
 ---
 

@@ -32,6 +32,7 @@
   --color-warning: #f59e0b;
   --color-error: #ef4444;
   --color-error-glow: rgba(239, 68, 68, 0.3);
+  --color-today-line: #ef4444;
 
   /* Gantt Chart Project Colors - with gradient pairs */
   --gantt-color-1: hsl(210, 65%, 55%);
@@ -397,6 +398,33 @@ body {
   border-bottom: 1px solid var(--color-border);
 }
 
+/* Month header with year alternating backgrounds */
+.month-header {
+  flex-shrink: 0;
+  padding: var(--spacing-sm);
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  border-right: 1px solid var(--color-border);
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.month-header.year-even {
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.month-header.year-first {
+  border-left: 2px solid var(--color-accent);
+  font-weight: 600;
+}
+
+[data-theme="light"] .month-header.year-even {
+  background: rgba(37, 99, 235, 0.06);
+}
+
 .gantt-row {
   display: flex;
   align-items: stretch;
@@ -597,6 +625,7 @@ body {
   background: var(--color-today-line);
   z-index: 15;
   pointer-events: none;
+  box-shadow: 0 0 8px var(--color-error-glow);
 }
 
 .today-marker::before {
@@ -606,9 +635,12 @@ body {
   left: 50%;
   transform: translateX(-50%);
   font-size: var(--font-size-xs);
-  color: var(--color-accent);
+  color: var(--color-today-line);
   white-space: nowrap;
   font-weight: 600;
+  background: var(--color-bg-tertiary);
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
 }
 
 /* Zebra Striping for Gantt Rows */

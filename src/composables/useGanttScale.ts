@@ -13,15 +13,35 @@ export function useGanttScale() {
     // 月份列表
     const months = computed(() => {
         const { start, end } = store.timeRange
-        const result: { year: number; month: number; label: string }[] = []
+        const result: {
+            year: number
+            month: number
+            label: string
+            shortLabel: string      // 簡短標籤：首月顯示 "YYYY-MM"，其他只顯示 "MM"
+            isFirstMonthOfYear: boolean
+            isEvenYear: boolean     // 用於年度交替背景色
+        }[] = []
 
         const current = new Date(start)
+        let prevYear = -1
+
         while (current <= end) {
+            const year = current.getFullYear()
+            const month = current.getMonth() + 1
+            const isFirstMonth = year !== prevYear
+
             result.push({
-                year: current.getFullYear(),
-                month: current.getMonth() + 1,
-                label: `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`
+                year,
+                month,
+                label: `${year}-${String(month).padStart(2, '0')}`,
+                shortLabel: isFirstMonth
+                    ? `${year}-${String(month).padStart(2, '0')}`
+                    : String(month).padStart(2, '0'),
+                isFirstMonthOfYear: isFirstMonth,
+                isEvenYear: year % 2 === 0
             })
+
+            prevYear = year
             current.setMonth(current.getMonth() + 1)
         }
 
@@ -101,12 +121,12 @@ export function useGanttScale() {
         const { start, end } = store.timeRange
         const today = new Date()
         today.setHours(0, 0, 0, 0)
-        
+
         // 檢查今天是否在時間範圍內
         if (today < start || today > end) {
             return -1 // 不在範圍內，不顯示
         }
-        
+
         const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
         return getXPosition(todayStr)
     }

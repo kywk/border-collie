@@ -184,11 +184,22 @@ function hideTooltip() {
             v-for="month in months"
             :key="month.label"
             class="month-header"
+            :class="{ 
+              'year-even': month.isEvenYear,
+              'year-first': month.isFirstMonthOfYear 
+            }"
             :style="{ width: store.scale.monthWidth + 'px' }"
           >
-            {{ month.label }}
+            {{ month.shortLabel }}
           </div>
         </div>
+        
+        <!-- Today Indicator in Header (pin head) -->
+        <div 
+          v-if="getTodayPosition() >= 0"
+          class="today-header-indicator"
+          :style="{ left: (getTodayPosition() + 140) + 'px' }"
+        />
       </div>
 
       <!-- 專案群組 -->
@@ -241,18 +252,18 @@ function hideTooltip() {
                 >
                   {{ phase.name }}
                 </div>
-                
-                <!-- Today Marker -->
-                <div 
-                  v-if="rowIdx === 0 && getTodayPosition() >= 0"
-                  class="today-marker"
-                  :style="{ left: getTodayPosition() + 'px' }"
-                />
               </div>
             </div>
           </div>
         </div>
       </div>
+      
+      <!-- Today Marker Line (Full Height) -->
+      <div 
+        v-if="getTodayPosition() >= 0"
+        class="today-marker-line"
+        :style="{ left: (getTodayPosition() + 140) + 'px' }"
+      />
     </div>
 
     <!-- Tooltip -->
@@ -419,28 +430,29 @@ function hideTooltip() {
   z-index: 5;
 }
 
-/* Today Marker */
-.today-marker {
+/* Today Marker - Full Height Line */
+.today-marker-line {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 2px;
-  background: var(--color-today-line);
-  z-index: 4;
+  background: #ef4444;
+  z-index: 10;
   pointer-events: none;
-  box-shadow: 0 0 8px var(--color-today-line);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
 }
 
-.today-marker::before {
-  content: '';
+/* Today Header Indicator - Circle aligned with line */
+.today-header-indicator {
   position: absolute;
-  top: 0;
-  left: -4px;
-  width: 10px;
-  height: 10px;
-  background: var(--color-accent);
+  bottom: -6px;
+  width: 12px;
+  height: 12px;
+  margin-left: -6px;
+  background: #ef4444;
   border-radius: 50%;
-  box-shadow: 0 0 6px var(--color-accent-glow);
+  z-index: 25;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 
 .tooltip {
