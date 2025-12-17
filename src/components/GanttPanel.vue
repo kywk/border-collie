@@ -77,6 +77,14 @@ async function handleExport(type: 'png' | 'svg' | 'ppt') {
           </div>
         </div>
         
+        <button 
+          class="style-toggle" 
+          @click="store.toggleBarStyle" 
+          :title="store.barStyle === 'block' ? '切換箭頭樣式' : '切換標準區塊樣式'"
+        >
+          {{ store.barStyle === 'block' ? '▭ 區塊' : '➤ 箭頭' }}
+        </button>
+        
         <button class="theme-toggle" @click="toggleTheme" :title="isDarkMode ? '切換淺色模式' : '切換深色模式'">
           {{ isDarkMode ? '☀️' : '🌙' }}
         </button>
@@ -166,5 +174,22 @@ async function handleExport(type: 'png' | 'svg' | 'ppt') {
 
 .dropdown-item:hover {
   background: var(--color-bg-hover);
+}
+
+/* Style Toggle Button */
+.style-toggle {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.style-toggle:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-accent);
 }
 </style>

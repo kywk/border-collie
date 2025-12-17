@@ -64,6 +64,10 @@ const projectRows = computed(() => {
     // 新專案
     if (phase.projectName !== currentProjectName) {
       if (currentProjectData) {
+        // 確保每一列的階段都按開始時間排序
+        currentProjectData.rows.forEach(row => {
+          row.sort((a, b) => new Date(normalizeDate(a.startDate)).getTime() - new Date(normalizeDate(b.startDate)).getTime())
+        })
         result.push(currentProjectData)
       }
       currentProjectName = phase.projectName
@@ -149,6 +153,10 @@ const projectRows = computed(() => {
 
   // 推入最後一個專案
   if (currentProjectData) {
+    // 確保每一列的階段都按開始時間排序 (確保 Z-index 正確: 最早的在最上面)
+    currentProjectData.rows.forEach(row => {
+      row.sort((a, b) => new Date(normalizeDate(a.startDate)).getTime() - new Date(normalizeDate(b.startDate)).getTime())
+    })
     result.push(currentProjectData)
   }
 
@@ -239,13 +247,17 @@ function hideTooltip() {
                 />
                 
               <div
-                  v-for="phase in row"
+                  v-for="(phase, index) in row"
                   :key="phase.name"
                   class="gantt-bar"
+                  :class="{ 
+                    'arrow-style': store.barStyle === 'arrow'
+                  }"
                   :style="{
-                    left: getXPosition(phase.startDate) + 'px',
-                    width: getWidth(phase.startDate, phase.endDate) + 'px',
-                    background: getProjectGradient(phase.projectIndex)
+                    left: (getXPosition(phase.startDate) - (store.barStyle === 'arrow' && phase.isContinuation ? 24 : 0)) + 'px',
+                    width: (getWidth(phase.startDate, phase.endDate) + (store.barStyle === 'arrow' && phase.isContinuation ? 24 : 0)) + 'px',
+                    background: getProjectGradient(phase.projectIndex),
+                    zIndex: store.barStyle === 'arrow' ? (100 - rowIdx * 10 - index) : 10
                   }"
                   @mouseenter="showTooltip($event, phase)"
                   @mouseleave="hideTooltip"
@@ -301,7 +313,7 @@ function hideTooltip() {
   position: sticky;
   top: 0;
   background: var(--color-bg-tertiary);
-  z-index: 30;
+  z-index: 300;
   border-bottom: 2px solid var(--color-border);
 }
 
@@ -313,7 +325,7 @@ function hideTooltip() {
   padding: var(--spacing-sm) var(--spacing-md);
   position: sticky;
   left: 0;
-  z-index: 31;
+  z-index: 301;
   background: var(--color-bg-tertiary);
 }
 
@@ -350,7 +362,7 @@ function hideTooltip() {
   border-right: 1px solid var(--color-border);
   position: sticky;
   left: 0;
-  z-index: 20;
+  z-index: 200;
 }
 
 .project-label {
@@ -430,6 +442,40 @@ function hideTooltip() {
   z-index: 5;
 }
 
+/* Arrow Style - Unified (Flat Left, Point Right) */
+.gantt-bar.arrow-style {
+  border-radius: 0;
+  padding-right: 16px;
+  /* Use drop-shadow instead of box-shadow so it follows the clip-path shape */
+  box-shadow: none !important; 
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.4));
+  clip-path: polygon(
+    0% 0%,             /* top-left flat */
+    calc(100% - 12px) 0%,   /* top-right before point */
+    100% 50%,          /* right arrow point */
+    calc(100% - 12px) 100%, /* bottom-right before point */
+    0% 100%            /* bottom-left flat */
+  );
+  padding-left: 8px;
+}
+
+.gantt-bar.arrow-style::before {
+  border-radius: 0;
+  clip-path: polygon(
+    0% 0%,
+    calc(100% - 12px) 0%,
+    100% 50%,
+    calc(100% - 12px) 100%,
+    0% 100%
+  );
+}
+
+.gantt-bar.arrow-style:hover {
+  transform: translateY(-50%) scale(1.02);
+  /* Enhance drop-shadow on hover */
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+}
+
 /* Today Marker - Full Height Line */
 .today-marker-line {
   position: absolute;
@@ -437,7 +483,7 @@ function hideTooltip() {
   bottom: 0;
   width: 2px;
   background: #ef4444;
-  z-index: 10;
+  z-index: 150;
   pointer-events: none;
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
 }
@@ -451,7 +497,7 @@ function hideTooltip() {
   margin-left: -6px;
   background: #ef4444;
   border-radius: 50%;
-  z-index: 25;
+  z-index: 305;
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
 }
 

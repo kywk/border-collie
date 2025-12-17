@@ -28,6 +28,7 @@ export interface ComputedPhase extends Omit<Phase, 'startDate'> {
     projectIndex: number
     startDate: string           // 計算後的實際開始日期
     totalAssignment: number     // 總投入人力
+    isContinuation: boolean     // 是否為接續前一階段 (決定箭頭樣式)
 }
 
 /** 人員投入記錄 */
@@ -39,6 +40,7 @@ export interface PersonAssignment {
     startDate: string
     endDate: string
     percentage: number
+    isContinuation: boolean     // 繼承自 Phase
 }
 
 /** 時間範圍 */

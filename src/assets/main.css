@@ -36,21 +36,21 @@
 
   /* Gantt Chart Project Colors - with gradient pairs */
   --gantt-color-1: hsl(210, 65%, 55%);
-  --gantt-color-1-light: hsl(210, 65%, 70%);
+  --gantt-color-1-light: hsl(210, 65%, 85%);
   --gantt-color-2: hsl(150, 55%, 50%);
-  --gantt-color-2-light: hsl(150, 55%, 65%);
+  --gantt-color-2-light: hsl(150, 55%, 80%);
   --gantt-color-3: hsl(30, 70%, 55%);
-  --gantt-color-3-light: hsl(30, 70%, 70%);
+  --gantt-color-3-light: hsl(30, 70%, 85%);
   --gantt-color-4: hsl(280, 50%, 60%);
-  --gantt-color-4-light: hsl(280, 50%, 75%);
+  --gantt-color-4-light: hsl(280, 50%, 85%);
   --gantt-color-5: hsl(350, 60%, 60%);
-  --gantt-color-5-light: hsl(350, 60%, 75%);
+  --gantt-color-5-light: hsl(350, 60%, 85%);
   --gantt-color-6: hsl(180, 55%, 50%);
-  --gantt-color-6-light: hsl(180, 55%, 65%);
+  --gantt-color-6-light: hsl(180, 55%, 80%);
   --gantt-color-7: hsl(60, 60%, 50%);
-  --gantt-color-7-light: hsl(60, 60%, 65%);
+  --gantt-color-7-light: hsl(60, 60%, 80%);
   --gantt-color-8: hsl(320, 55%, 55%);
-  --gantt-color-8-light: hsl(320, 55%, 70%);
+  --gantt-color-8-light: hsl(320, 55%, 85%);
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -134,21 +134,21 @@
 
   /* Gantt colors - more saturated for light theme */
   --gantt-color-1: hsl(210, 85%, 50%);
-  --gantt-color-1-light: hsl(210, 85%, 65%);
+  --gantt-color-1-light: hsl(210, 85%, 80%);
   --gantt-color-2: hsl(150, 75%, 40%);
-  --gantt-color-2-light: hsl(150, 75%, 55%);
+  --gantt-color-2-light: hsl(150, 75%, 75%);
   --gantt-color-3: hsl(30, 90%, 50%);
-  --gantt-color-3-light: hsl(30, 90%, 65%);
+  --gantt-color-3-light: hsl(30, 90%, 80%);
   --gantt-color-4: hsl(280, 70%, 55%);
-  --gantt-color-4-light: hsl(280, 70%, 70%);
+  --gantt-color-4-light: hsl(280, 70%, 80%);
   --gantt-color-5: hsl(350, 80%, 55%);
-  --gantt-color-5-light: hsl(350, 80%, 70%);
+  --gantt-color-5-light: hsl(350, 80%, 80%);
   --gantt-color-6: hsl(180, 75%, 40%);
-  --gantt-color-6-light: hsl(180, 75%, 55%);
+  --gantt-color-6-light: hsl(180, 75%, 75%);
   --gantt-color-7: hsl(80, 80%, 40%);
-  --gantt-color-7-light: hsl(80, 80%, 55%);
+  --gantt-color-7-light: hsl(80, 80%, 75%);
   --gantt-color-8: hsl(320, 75%, 50%);
-  --gantt-color-8-light: hsl(320, 75%, 65%);
+  --gantt-color-8-light: hsl(320, 75%, 80%);
 
   --color-today-line: rgba(37, 99, 235, 0.5);
 }

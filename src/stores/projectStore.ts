@@ -32,6 +32,13 @@ export const useProjectStore = defineStore('projects', () => {
         monthWidth: 60,
         rowHeight: 48
     })
+    // Bar style: 'block' for standard rectangular bars, 'arrow' for chevron/arrow style
+    const barStyle = ref<'block' | 'arrow'>('block')
+
+    // Toggle bar style
+    function toggleBarStyle() {
+        barStyle.value = barStyle.value === 'block' ? 'arrow' : 'block'
+    }
 
     // 初始化：從 LocalStorage 或 默認值載入
     function init() {
@@ -98,12 +105,16 @@ export const useProjectStore = defineStore('projects', () => {
                     (sum, a) => sum + a.percentage, 0
                 )
 
+                // 判斷是否為接續階段 (原 startDate 為空且有前一階段)
+                const isContinuation = !phase.startDate && !!previousEndDate
+
                 result.push({
                     ...phase,
                     projectName: project.name,
                     projectIndex,
                     startDate,
-                    totalAssignment
+                    totalAssignment,
+                    isContinuation
                 })
 
                 previousEndDate = phase.endDate
@@ -139,7 +150,8 @@ export const useProjectStore = defineStore('projects', () => {
                     phaseName: phase.name,
                     startDate: phase.startDate,
                     endDate: phase.endDate,
-                    percentage: a.percentage
+                    percentage: a.percentage,
+                    isContinuation: phase.isContinuation
                 })
             })
         })
@@ -189,6 +201,7 @@ export const useProjectStore = defineStore('projects', () => {
         rawText,
         projects,
         scale,
+        barStyle,
         // Actions
         init,
         updateText,
@@ -196,6 +209,7 @@ export const useProjectStore = defineStore('projects', () => {
         zoomIn,
         zoomOut,
         resetZoom,
+        toggleBarStyle,
         // Computed
         computedPhases,
         allPersons,
