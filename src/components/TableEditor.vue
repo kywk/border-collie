@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useProjectStore } from '@/stores/projectStore'
-import type { Project, Phase, Assignment } from '@/types'
+import type { Project, Phase } from '@/types'
 
 const store = useProjectStore()
 

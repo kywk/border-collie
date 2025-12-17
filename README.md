@@ -27,7 +27,8 @@ BorderCollie 是一個現代化、輕量級的專案管理與人力資源甘特�
 ## 🚀 快速開始
 
 ### 線上體驗
-(此處可填入部署後的 URL)
+
+**https://kywk.github.io/BorderCollie/**
 
 ### 本地執行
 

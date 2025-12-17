@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from 'pinia'
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import type { Project, ComputedPhase, PersonAssignment, TimeRange, GanttScale } from '@/types'
 import { parseText } from '@/parser/textParser'
 import { serializeToText } from '@/parser/serializer'

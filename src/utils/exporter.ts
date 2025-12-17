@@ -99,7 +99,7 @@ export function exportToPpt(mode: 'project' | 'person', store: any) {
 }
 
 // Helper to add a new slide with header
-function addNewSlide(pptx: PptxGenJS, title: string, store: any, slideW: number, graphX: number, graphY: number, availableW: number) {
+function addNewSlide(pptx: PptxGenJS, title: string, store: any, graphX: number, graphY: number, availableW: number) {
     const slide = pptx.addSlide()
     slide.addText(title, { x: 0.5, y: 0.3, fontSize: 24, bold: true, color: '363636' })
 
@@ -131,7 +131,7 @@ function createProjectSlides(pptx: PptxGenJS, store: any, slideW: number, slideH
 
     const { startDate, endDate } = getTimelineData(store)
 
-    let currentSlide = addNewSlide(pptx, '專案甘特圖', store, slideW, graphX, graphY, availableW)
+    let currentSlide = addNewSlide(pptx, '專案甘特圖', store, graphX, graphY, availableW)
     let currentY = graphY + 0.5
 
     store.projects.forEach((proj: Project, pIdx: number) => {
@@ -172,7 +172,7 @@ function createProjectSlides(pptx: PptxGenJS, store: any, slideW: number, slideH
 
         // Check if we need new slide
         if (currentY + projectHeight > slideH - 0.5) {
-            currentSlide = addNewSlide(pptx, '專案甘特圖 (續)', store, slideW, graphX, graphY, availableW)
+            currentSlide = addNewSlide(pptx, '專案甘特圖 (續)', store, graphX, graphY, availableW)
             currentY = graphY + 0.5
         }
 
@@ -252,12 +252,12 @@ function createPersonSlides(pptx: PptxGenJS, store: any, slideW: number, slideH:
 
     const { startDate, endDate } = getTimelineData(store)
 
-    let currentSlide = addNewSlide(pptx, '人力甘特圖', store, slideW, graphX, graphY, availableW)
+    let currentSlide = addNewSlide(pptx, '人力甘特圖', store, graphX, graphY, availableW)
     let currentY = graphY + 0.5
 
     store.allPersons.forEach((person: string, pIdx: number) => {
         if (currentY + rowH > slideH - 0.5) {
-            currentSlide = addNewSlide(pptx, '人力甘特圖 (續)', store, slideW, graphX, graphY, availableW)
+            currentSlide = addNewSlide(pptx, '人力甘特圖 (續)', store, graphX, graphY, availableW)
             currentY = graphY + 0.5
         }
 

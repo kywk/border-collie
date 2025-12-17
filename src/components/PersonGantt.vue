@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useProjectStore } from '@/stores/projectStore'
 import { useGanttScale } from '@/composables/useGanttScale'
-import { normalizeDate, isMonthFormat } from '@/parser/textParser'
+import { normalizeDate } from '@/parser/textParser'
 import type { PersonAssignment } from '@/types'
 
 const store = useProjectStore()
@@ -284,7 +284,7 @@ function getOpacity(percentage: number): number {
               :class="{
                 'workload-overload': getMonthWorkloadStatus(personData.person, month.label) === 'overload',
                 'workload-underload': getMonthWorkloadStatus(personData.person, month.label) === 'underload',
-                'workload-unavailable': getMonthWorkloadStatus(personData.person, month.label) === 'unavailable'
+                'workload-unavailable': false
               }"
               :style="{ width: store.scale.monthWidth + 'px' }"
             />
