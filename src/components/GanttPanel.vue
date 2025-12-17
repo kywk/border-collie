@@ -82,7 +82,28 @@ async function handleExport(type: 'png' | 'svg' | 'ppt') {
           @click="store.toggleBarStyle" 
           :title="store.barStyle === 'block' ? '切換箭頭樣式' : '切換標準區塊樣式'"
         >
-          {{ store.barStyle === 'block' ? '▭ 區塊' : '➤ 箭頭' }}
+          <!-- Arrow Icon (Emerald Gradient) - Show when in Block mode (to switch to Arrow) -->
+          <svg v-if="store.barStyle === 'block'" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="icon-arrow-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#34d399" />
+                <stop offset="100%" stop-color="#10b981" />
+              </linearGradient>
+            </defs>
+            <path d="M2 7h15l5 5-5 5H2V7z" fill="url(#icon-arrow-grad)" />
+            <path d="M6 12h10" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <!-- Block Icon (Blue Gradient) - Show when in Arrow mode (to switch to Block) -->
+          <svg v-else width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <defs>
+              <linearGradient id="icon-block-grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#60a5fa" />
+                <stop offset="100%" stop-color="#3b82f6" />
+              </linearGradient>
+            </defs>
+            <rect x="3" y="7" width="18" height="10" rx="3" fill="url(#icon-block-grad)" />
+            <path d="M7 12h10" stroke="rgba(255,255,255,0.6)" stroke-width="2" stroke-linecap="round"/>
+          </svg>
         </button>
         
         <button class="theme-toggle" @click="toggleTheme" :title="isDarkMode ? '切換淺色模式' : '切換深色模式'">
@@ -154,7 +175,7 @@ async function handleExport(type: 'png' | 'svg' | 'ppt') {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   padding: var(--spacing-xs);
-  z-index: 100;
+  z-index: 1000;
   min-width: 150px;
   display: flex;
   flex-direction: column;
@@ -176,20 +197,5 @@ async function handleExport(type: 'png' | 'svg' | 'ppt') {
   background: var(--color-bg-hover);
 }
 
-/* Style Toggle Button */
-.style-toggle {
-  background: var(--color-bg-primary);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  font-size: var(--font-size-sm);
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
 
-.style-toggle:hover {
-  background: var(--color-bg-hover);
-  border-color: var(--color-accent);
-}
 </style>
