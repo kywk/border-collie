@@ -6,7 +6,7 @@ import { normalizeDate } from '@/parser/textParser'
 import type { PersonAssignment } from '@/types'
 
 const store = useProjectStore()
-const { months, totalWidth, getXPosition, getWidth, getProjectColor } = useGanttScale()
+const { months, totalWidth, getXPosition, getWidth, getProjectColor, getProjectGradient } = useGanttScale()
 
 // Tooltip 狀態
 const tooltip = ref<{
@@ -318,7 +318,7 @@ function getOpacity(percentage: number): number {
                   :style="{
                     left: getXPosition(assignment.startDate) + 'px',
                     width: getWidth(assignment.startDate, assignment.endDate) + 'px',
-                    backgroundColor: getProjectColor(assignment.projectIndex),
+                    background: getProjectGradient(assignment.projectIndex),
                     opacity: getOpacity(assignment.percentage)
                   }"
                   @mouseenter="showTooltip($event, assignment)"
@@ -504,20 +504,33 @@ function getOpacity(percentage: number): number {
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: white;
   cursor: pointer;
-  transition: filter var(--transition-fast), transform var(--transition-fast);
+  transition: all var(--transition-fast);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 var(--spacing-sm);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.gantt-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  pointer-events: none;
 }
 
 .gantt-bar:hover {
-  filter: brightness(1.15);
-  transform: translateY(-50%) scale(1.02);
+  transform: translateY(-50%) scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 5;
   opacity: 1 !important;
 }

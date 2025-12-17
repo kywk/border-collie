@@ -6,7 +6,7 @@ import { normalizeDate } from '@/parser/textParser'
 import type { ComputedPhase } from '@/types'
 
 const store = useProjectStore()
-const { months, totalWidth, getXPosition, getWidth, getProjectColor } = useGanttScale()
+const { months, totalWidth, getXPosition, getWidth, getProjectColor, getProjectGradient, getTodayPosition } = useGanttScale()
 
 // Tooltip 狀態
 const tooltip = ref<{
@@ -227,21 +227,27 @@ function hideTooltip() {
                   :style="{ width: store.scale.monthWidth + 'px' }"
                 />
                 
-                <!-- 階段 Bar -->
-                <div
+              <div
                   v-for="phase in row"
                   :key="phase.name"
                   class="gantt-bar"
                   :style="{
                     left: getXPosition(phase.startDate) + 'px',
                     width: getWidth(phase.startDate, phase.endDate) + 'px',
-                    backgroundColor: getProjectColor(phase.projectIndex)
+                    background: getProjectGradient(phase.projectIndex)
                   }"
                   @mouseenter="showTooltip($event, phase)"
                   @mouseleave="hideTooltip"
                 >
                   {{ phase.name }}
                 </div>
+                
+                <!-- Today Marker -->
+                <div 
+                  v-if="rowIdx === 0 && getTodayPosition() >= 0"
+                  class="today-marker"
+                  :style="{ left: getTodayPosition() + 'px' }"
+                />
               </div>
             </div>
           </div>
@@ -383,21 +389,58 @@ function hideTooltip() {
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: white;
   cursor: pointer;
-  transition: filter var(--transition-fast), transform var(--transition-fast);
+  transition: all var(--transition-fast);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   padding: 0 var(--spacing-sm);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.gantt-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 100%);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  pointer-events: none;
 }
 
 .gantt-bar:hover {
-  filter: brightness(1.15);
-  transform: translateY(-50%) scale(1.02);
+  transform: translateY(-50%) scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   z-index: 5;
+}
+
+/* Today Marker */
+.today-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-today-line);
+  z-index: 4;
+  pointer-events: none;
+  box-shadow: 0 0 8px var(--color-today-line);
+}
+
+.today-marker::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -4px;
+  width: 10px;
+  height: 10px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color-accent-glow);
 }
 
 .tooltip {

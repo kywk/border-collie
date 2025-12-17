@@ -1,13 +1,21 @@
 /* =============================================
-   BorderCollie - Design System
+   BorderCollie - Design System v2.0
+   Modern, Glassmorphic, Premium Design
    ============================================= */
 
 /* CSS Variables - Dark Theme (Default) */
 :root {
+  /* Background with subtle gradient support */
   --color-bg-primary: #0f172a;
   --color-bg-secondary: #1e293b;
   --color-bg-tertiary: #334155;
   --color-bg-hover: #475569;
+  --color-bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(30, 41, 59, 0.8);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 12px;
 
   --color-text-primary: #f1f5f9;
   --color-text-secondary: #94a3b8;
@@ -18,19 +26,30 @@
 
   --color-accent: #3b82f6;
   --color-accent-hover: #2563eb;
+  --color-accent-glow: rgba(59, 130, 246, 0.4);
   --color-success: #22c55e;
+  --color-success-glow: rgba(34, 197, 94, 0.3);
   --color-warning: #f59e0b;
   --color-error: #ef4444;
+  --color-error-glow: rgba(239, 68, 68, 0.3);
 
-  /* Gantt Chart Project Colors */
-  --gantt-color-1: hsl(210, 60%, 65%);
-  --gantt-color-2: hsl(150, 50%, 55%);
-  --gantt-color-3: hsl(30, 65%, 60%);
-  --gantt-color-4: hsl(280, 45%, 65%);
-  --gantt-color-5: hsl(350, 55%, 65%);
-  --gantt-color-6: hsl(180, 50%, 55%);
-  --gantt-color-7: hsl(60, 55%, 55%);
-  --gantt-color-8: hsl(320, 50%, 60%);
+  /* Gantt Chart Project Colors - with gradient pairs */
+  --gantt-color-1: hsl(210, 65%, 55%);
+  --gantt-color-1-light: hsl(210, 65%, 70%);
+  --gantt-color-2: hsl(150, 55%, 50%);
+  --gantt-color-2-light: hsl(150, 55%, 65%);
+  --gantt-color-3: hsl(30, 70%, 55%);
+  --gantt-color-3-light: hsl(30, 70%, 70%);
+  --gantt-color-4: hsl(280, 50%, 60%);
+  --gantt-color-4-light: hsl(280, 50%, 75%);
+  --gantt-color-5: hsl(350, 60%, 60%);
+  --gantt-color-5-light: hsl(350, 60%, 75%);
+  --gantt-color-6: hsl(180, 55%, 50%);
+  --gantt-color-6-light: hsl(180, 55%, 65%);
+  --gantt-color-7: hsl(60, 60%, 50%);
+  --gantt-color-7-light: hsl(60, 60%, 65%);
+  --gantt-color-8: hsl(320, 55%, 55%);
+  --gantt-color-8-light: hsl(320, 55%, 70%);
 
   /* Typography */
   --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -51,62 +70,86 @@
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
 
-  /* Border Radius */
-  --radius-sm: 0.25rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  /* Border Radius - Larger for modern feel */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-pill: 9999px;
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  /* Enhanced Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.2), 0 2px 6px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.25), 0 4px 8px -4px rgb(0 0 0 / 0.15);
+  --shadow-glow: 0 0 20px var(--color-accent-glow);
+  --shadow-panel: 0 8px 32px -8px rgb(0 0 0 / 0.3);
 
   /* Transitions */
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 350ms ease;
+  --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
   /* Alternating Row Background */
-  --color-bg-alt: rgba(255, 255, 255, 0.02);
+  --color-bg-alt: rgba(255, 255, 255, 0.03);
+
+  /* Today marker */
+  --color-today-line: rgba(59, 130, 246, 0.6);
 }
 
-/* Light Theme */
+/* Light Theme - Enhanced */
 [data-theme="light"] {
   --color-bg-primary: #f8fafc;
-  /* Slate 50 - Brighter optimization */
   --color-bg-secondary: #ffffff;
-  /* Pure White */
   --color-bg-tertiary: #f1f5f9;
-  /* Slate 100 - Very light gray for headers */
   --color-bg-hover: #e2e8f0;
-  /* Slate 200 */
+  --color-bg-gradient: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+
+  /* Glassmorphism - Light */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(0, 0, 0, 0.08);
+  --glass-blur: 12px;
 
   --color-text-primary: #0f172a;
-  /* Slate 900 */
   --color-text-secondary: #475569;
-  /* Slate 600 */
-  --color-text-muted: #94a3b8;
-  /* Slate 400 */
+  --color-text-muted: #64748b;
 
-  --color-border: #e2e8f0;
-  /* Slate 200 - Lighter border */
+  --color-border: #cbd5e1;
   --color-border-focus: #3b82f6;
 
   --color-accent: #2563eb;
   --color-accent-hover: #1d4ed8;
+  --color-accent-glow: rgba(37, 99, 235, 0.3);
+  --color-success-glow: rgba(34, 197, 94, 0.25);
+  --color-error-glow: rgba(239, 68, 68, 0.25);
 
-  --color-bg-alt: rgba(0, 0, 0, 0.02);
-  /* Light gray for alternating rows in light mode */
+  --color-bg-alt: rgba(0, 0, 0, 0.025);
 
-  /* Gantt colors slightly more saturated for light theme */
-  --gantt-color-1: hsl(210, 80%, 60%);
-  --gantt-color-2: hsl(150, 70%, 45%);
-  --gantt-color-3: hsl(30, 85%, 55%);
-  --gantt-color-4: hsl(280, 65%, 60%);
-  --gantt-color-5: hsl(350, 75%, 60%);
-  --gantt-color-6: hsl(180, 70%, 45%);
-  --gantt-color-7: hsl(80, 75%, 45%);
-  --gantt-color-8: hsl(320, 70%, 55%);
+  /* Enhanced Shadows - Light */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.12), 0 4px 8px -4px rgb(0 0 0 / 0.06);
+  --shadow-panel: 0 4px 24px -6px rgb(0 0 0 / 0.1);
+
+  /* Gantt colors - more saturated for light theme */
+  --gantt-color-1: hsl(210, 85%, 50%);
+  --gantt-color-1-light: hsl(210, 85%, 65%);
+  --gantt-color-2: hsl(150, 75%, 40%);
+  --gantt-color-2-light: hsl(150, 75%, 55%);
+  --gantt-color-3: hsl(30, 90%, 50%);
+  --gantt-color-3-light: hsl(30, 90%, 65%);
+  --gantt-color-4: hsl(280, 70%, 55%);
+  --gantt-color-4-light: hsl(280, 70%, 70%);
+  --gantt-color-5: hsl(350, 80%, 55%);
+  --gantt-color-5-light: hsl(350, 80%, 70%);
+  --gantt-color-6: hsl(180, 75%, 40%);
+  --gantt-color-6-light: hsl(180, 75%, 55%);
+  --gantt-color-7: hsl(80, 80%, 40%);
+  --gantt-color-7-light: hsl(80, 80%, 55%);
+  --gantt-color-8: hsl(320, 75%, 50%);
+  --gantt-color-8-light: hsl(320, 75%, 65%);
+
+  --color-today-line: rgba(37, 99, 235, 0.5);
 }
 
 /* Reset & Base */
@@ -132,7 +175,9 @@ body {
   font-size: var(--font-size-base);
   line-height: 1.6;
   color: var(--color-text-primary);
-  background-color: var(--color-bg-primary);
+  background: var(--color-bg-gradient);
+  background-attachment: fixed;
+  transition: background var(--transition-slow), color var(--transition-slow);
 }
 
 /* App Layout - Full Height */
@@ -150,7 +195,7 @@ body {
   overflow: hidden;
 }
 
-/* Panel Base */
+/* Panel Base - Glassmorphism */
 .panel {
   display: flex;
   flex-direction: column;
@@ -158,6 +203,9 @@ body {
   border-radius: var(--radius-lg);
   overflow: hidden;
   height: 100%;
+  box-shadow: var(--shadow-panel);
+  border: 1px solid var(--glass-border);
+  transition: background var(--transition-slow), border-color var(--transition-slow);
 }
 
 .panel-header {
@@ -165,9 +213,12 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--color-bg-tertiary);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: 1px solid var(--glass-border);
   flex-shrink: 0;
+  transition: background var(--transition-slow);
 }
 
 .panel-title {
@@ -184,7 +235,7 @@ body {
   padding: var(--spacing-md);
 }
 
-/* Buttons */
+/* Buttons - Enhanced with micro-animations */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -197,15 +248,36 @@ body {
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all var(--transition-fast);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.btn:hover::after {
+  opacity: 1;
+}
+
+.btn:active {
+  transform: scale(0.98);
 }
 
 .btn-primary {
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
   color: white;
+  box-shadow: 0 2px 8px var(--color-accent-glow);
 }
 
 .btn-primary:hover {
-  background: var(--color-accent-hover);
+  box-shadow: 0 4px 16px var(--color-accent-glow);
+  transform: translateY(-1px);
 }
 
 .btn-ghost {
@@ -216,23 +288,33 @@ body {
 .btn-ghost:hover {
   background: var(--color-bg-hover);
   color: var(--color-text-primary);
+  transform: translateY(-1px);
 }
 
 .btn-ghost.active {
-  background: var(--color-accent);
+  background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-accent-hover) 100%);
   color: white;
+  box-shadow: 0 2px 8px var(--color-accent-glow);
 }
 
-/* Toggle Group */
+/* Toggle Group - Pill Shape with Indicator */
 .toggle-group {
   display: inline-flex;
   background: var(--color-bg-primary);
-  border-radius: var(--radius-md);
-  padding: 2px;
+  border-radius: var(--radius-pill);
+  padding: 3px;
+  gap: 2px;
+  border: 1px solid var(--glass-border);
 }
 
 .toggle-group .btn {
-  border-radius: calc(var(--radius-md) - 2px);
+  border-radius: var(--radius-pill);
+  padding: var(--spacing-xs) var(--spacing-md);
+  transition: all var(--transition-normal);
+}
+
+.toggle-group .btn.active {
+  box-shadow: 0 2px 8px var(--color-accent-glow);
 }
 
 /* Editor Area */
@@ -352,17 +434,33 @@ body {
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-weight: 600;
   color: white;
   cursor: pointer;
-  transition: opacity var(--transition-fast);
+  transition: all var(--transition-fast);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.gantt-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  pointer-events: none;
 }
 
 .gantt-bar:hover {
-  filter: brightness(1.1);
+  transform: translateY(-50%) scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  z-index: 5;
 }
 
 /* Zoom Controls */
@@ -434,25 +532,33 @@ body {
   gap: var(--spacing-md);
 }
 
-/* Theme Toggle Button */
+/* Theme Toggle Button - Animated */
 .theme-toggle {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   padding: 0;
-  font-size: var(--font-size-lg);
-  background: transparent;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
+  font-size: var(--font-size-xl);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
   cursor: pointer;
-  transition: all var(--transition-fast);
+  transition: all var(--transition-normal);
 }
 
 .theme-toggle:hover {
   background: var(--color-bg-hover);
-  border-color: var(--color-border-focus);
+  border-color: var(--color-accent);
+  transform: rotate(15deg) scale(1.05);
+  box-shadow: var(--shadow-glow);
+}
+
+.theme-toggle:active {
+  transform: rotate(0deg) scale(0.95);
 }
 
 /* Logo/Brand in Panel */
@@ -460,10 +566,52 @@ body {
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
-  font-weight: 600;
-  font-size: var(--font-size-base);
-  background: linear-gradient(135deg, var(--color-accent), #a78bfa);
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #a78bfa 50%, #f472b6 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Today Marker Line */
+.today-marker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-today-line);
+  z-index: 15;
+  pointer-events: none;
+}
+
+.today-marker::before {
+  content: '今天';
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-accent);
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Zebra Striping for Gantt Rows */
+.gantt-row:nth-child(even) {
+  background: var(--color-bg-alt);
 }

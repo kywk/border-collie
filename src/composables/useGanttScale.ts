@@ -80,11 +80,44 @@ export function useGanttScale() {
         return colors[projectIndex % colors.length]
     }
 
+    // 取得專案漸層色
+    function getProjectGradient(projectIndex: number): string {
+        const colorPairs = [
+            { base: 'var(--gantt-color-1)', light: 'var(--gantt-color-1-light)' },
+            { base: 'var(--gantt-color-2)', light: 'var(--gantt-color-2-light)' },
+            { base: 'var(--gantt-color-3)', light: 'var(--gantt-color-3-light)' },
+            { base: 'var(--gantt-color-4)', light: 'var(--gantt-color-4-light)' },
+            { base: 'var(--gantt-color-5)', light: 'var(--gantt-color-5-light)' },
+            { base: 'var(--gantt-color-6)', light: 'var(--gantt-color-6-light)' },
+            { base: 'var(--gantt-color-7)', light: 'var(--gantt-color-7-light)' },
+            { base: 'var(--gantt-color-8)', light: 'var(--gantt-color-8-light)' },
+        ]
+        const pair = colorPairs[projectIndex % colorPairs.length]
+        return `linear-gradient(135deg, ${pair.light} 0%, ${pair.base} 100%)`
+    }
+
+    // 取得今天的 X 座標位置
+    function getTodayPosition(): number {
+        const { start, end } = store.timeRange
+        const today = new Date()
+        today.setHours(0, 0, 0, 0)
+        
+        // 檢查今天是否在時間範圍內
+        if (today < start || today > end) {
+            return -1 // 不在範圍內，不顯示
+        }
+        
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+        return getXPosition(todayStr)
+    }
+
     return {
         months,
         totalWidth,
         getXPosition,
         getWidth,
-        getProjectColor
+        getProjectColor,
+        getProjectGradient,
+        getTodayPosition
     }
 }
