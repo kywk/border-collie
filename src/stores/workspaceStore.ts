@@ -5,6 +5,7 @@
 
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { throttle } from 'lodash-es'
 import { parseFrontmatter, serializeFrontmatter, generateUniqueName, type Frontmatter } from '@/parser/frontmatterParser'
 
 // Constants
@@ -155,7 +156,7 @@ export const useWorkspaceStore = defineStore('workspaces', () => {
     function switchWorkspace(id: string) {
         if (workspaces.value.find(w => w.id === id)) {
             currentId.value = id
-            persist()
+            persistNow()
         }
     }
 
@@ -202,7 +203,7 @@ export const useWorkspaceStore = defineStore('workspaces', () => {
             currentId.value = workspaces.value[0].id
         }
 
-        persist()
+        persistNow()
         return true
     }
 
@@ -270,7 +271,7 @@ export const useWorkspaceStore = defineStore('workspaces', () => {
                 existing.content = frontmatter ? content : text
                 existing.updatedAt = nowISO()
                 currentId.value = existing.id
-                persist()
+                persistNow()
                 return { status: 'imported', newId: existing.id }
             }
         }
@@ -292,15 +293,26 @@ export const useWorkspaceStore = defineStore('workspaces', () => {
 
         workspaces.value.push(ws)
         currentId.value = ws.id
-        persist()
+        persistNow()
 
         return { status: 'imported', newId: ws.id }
     }
 
     /**
-     * 持久化到 localStorage
+     * 持久化到 localStorage（帶 throttle，最多每秒一次）
      */
-    function persist() {
+    const persist = throttle(() => {
+        const data: StorageData = {
+            workspaces: workspaces.value,
+            currentId: currentId.value
+        }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+    }, 1000, { leading: true, trailing: true })
+
+    /**
+     * 立即持久化（用於關鍵操作如刪除、切換）
+     */
+    function persistNow() {
         const data: StorageData = {
             workspaces: workspaces.value,
             currentId: currentId.value
