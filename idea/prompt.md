@@ -24,21 +24,47 @@
 
 ## 純文字編輯規格
 
+BorderCollie 使用 Frontmatter + 專案定義的純文字格式。
+
+### 完整格式
+
 ```text
+name: 工作區名稱
+description: 描述（選填）
+gist: GIST_ID（選填）
+createdAt: 2025-12-18（選填）
+---
 專案名稱:
-- 階段名, 開始時間, 結束時間: 人員1 投入比, 人員2 投入比, ...
+- 階段名, 開始時間, 結束時間: 人員1 投入比, 人員2 投入比
 - 階段名, --, 結束時間: 人員3 投入比
+
+另一專案:
+- ...
 ```
 
 ### 語法規則
-1. **專案宣告**：`專案名稱:` （冒號結尾）
+
+#### Frontmatter（`---` 之前，選用）
+| 欄位 | 必填 | 說明 |
+|------|------|------|
+| `name` | ✅ | 工作區名稱，顯示於下拉選單 |
+| `description` | ❌ | 描述，顯示於下拉選單提示 |
+| `gist` | ❌ | Gist ID，用於雲端同步 |
+| `createdAt` | ❌ | 建立時間 |
+
+#### 專案內容（`---` 之後）
+1. **專案宣告**：`專案名稱:`（冒號結尾）
 2. **階段定義**：`- 階段名, 開始日期, 結束日期: 人員指派`
 3. **日期格式**：`YYYY-MM`（月視圖）或 `YYYY-MM-DD`（日視圖）
 4. **自動接續**：開始日期填 `--` 表示接續前一階段結束時間
-5. **人員指派**：`人員名稱 投入比例`，投入比例為 `0.1` ~ `1.0`
+5. **人員指派**：`人員名稱 投入比例`，投入比例 `0.1` ~ `1.0`
 
-### 範例
+### 完整範例
+
 ```text
+name: AI 專案規劃 2025
+description: 年度 AI 專案時程與人力配置
+---
 AI OCR:
 - BA, 2025-10-01, 2025-11-30: Andy 0.3, Ben 0.8, Cat 0.5
 - SA, --, 2026-02: Andy 0.3, Danny 0.6, Elsa 0.2
@@ -67,22 +93,25 @@ Staff Portal:
 - 時間範圍依專案實際時間自動計算
 - 若某階段開始日期為 `--`，和前一階段畫在同一列
 - 支援縮放功能，方便截圖貼簡報
-- **箭頭視圖**：可切換為箭頭樣式，視覺化階段流向，自動處理接續階段的重疊與層級顯示
+- **箭頭視圖**：可切換為箭頭樣式，視覺化階段流向
 
 ### 人力甘特圖
 - 縱軸為人員，橫軸為時間
 - 以人員為主，對各專案不同階段投入作 group
 - 相同專案不同階段，若時間不重疊，在同一列顯示
 - 線段顏色依投入百分比呈現濃淡（40% ~ 100%）
-- **工作負載警示**：
-  - 超過 110%：紅色背景（縱向跨越該月份所有列）
-  - 少於 50%：綠色背景
-  - 0%：無背景（表示人員尚未報到或另有調度）
+- **工作負載警示**：超過 110% 紅色背景、少於 50% 綠色背景
 
 ### 分享功能
-- URL `?data=compressed` 格式
-- 純文字資料經 LZ-String 壓縮編碼（比 Gzip+Base64 短約 10-15%）
+- URL `?data=compressed` 格式，LZ-String 壓縮編碼
 - 無需後端即可分享
+- **衝突處理**：若專案名稱與本地衝突，可選擇覆蓋/重新命名/取消
+
+### Workspace 多專案管理
+- 支援多組專案儲存於 LocalStorage
+- 使用 Frontmatter 定義專案元資料
+- 工作區下拉選單：快速切換、新增、刪除專案
+- 自動遷移舊版 localStorage 資料
 
 ---
 
@@ -134,11 +163,14 @@ Staff Portal:
 6. ✅ LZ-String 壓縮替代 Gzip+Base64（URL 長度減少 10-15%）
 7. ✅ 年度時間軸格式：首月顯示完整年月，不同年度交替背景
 8. ✅ Today Marker 大頭針設計：紅色圓點 + 垂直線貫穿整個甘特圖
-9. ✅ **箭頭顯示模式**：支援標準/箭頭雙模式切換，箭頭模式具備自動重疊 (Overlap)、層級排序 (Z-Index) 與陰影效果 (Drop Shadow)
-130. ✅ **UI/UX 優化**：
-    - 修正 Export 下拉選單 Z-index 層級問題
-    - 提升甘特圖文字對比度與易讀性
-    - 統一 Toggle 按鈕視覺風格 (彩色漸層 Icon、一致的懸停動畫) 與操作邏輯
+9. ✅ **箭頭顯示模式**：支援標準/箭頭雙模式切換
+10. ✅ **UI/UX 優化**：修正 Export 下拉選單 Z-index、統一 Toggle 按鈕風格
+11. ✅ **Workspace 多專案管理**：
+    - Frontmatter 解析器（name/gist/description/createdAt）
+    - workspaceStore 多專案 CRUD 與 localStorage 持久化
+    - WorkspaceDropdown 下拉選單元件
+    - 分享連結衝突處理（覆蓋/重新命名/取消）
+    - 自動遷移舊版 localStorage 資料
 
 ---
 
@@ -154,7 +186,10 @@ Staff Portal:
 - `README.md` - 專案說明與使用方式
 - `INSTALL.md` - 安裝與部署步驟
 - `src/parser/textParser.ts` - 純文字解析邏輯
-- `src/stores/projectStore.ts` - 狀態管理
+- `src/parser/frontmatterParser.ts` - Frontmatter 解析邏輯
+- `src/stores/projectStore.ts` - 專案狀態管理
+- `src/stores/workspaceStore.ts` - 工作區狀態管理
 - `src/composables/useGanttScale.ts` - 甘特圖時間軸計算
 - `src/components/ProjectGantt.vue` - 專案甘特圖
 - `src/components/PersonGantt.vue` - 人力甘特圖
+- `src/components/WorkspaceDropdown.vue` - 工作區下拉選單

@@ -1,16 +1,17 @@
 /**
  * BorderCollie - Project Store
- * Pinia store 管理專案資料與 LocalStorage 持久化
+ * Pinia store 管理專案資料解析與甘特圖計算
+ * 注意：持久化由 workspaceStore 處理
  */
 
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { defineStore, storeToRefs } from 'pinia'
+import { ref, computed, watch } from 'vue'
 import type { Project, ComputedPhase, PersonAssignment, TimeRange, GanttScale } from '@/types'
 import { parseText } from '@/parser/textParser'
 import { serializeToText } from '@/parser/serializer'
 import { normalizeDate } from '@/parser/textParser'
-
-const STORAGE_KEY = 'border-collie-projects'
+import { useWorkspaceStore } from './workspaceStore'
+import { parseFrontmatter } from '@/parser/frontmatterParser'
 
 const DEFAULT_TEXT = `AI OCR:
 - BA, 2025-10-01, 2025-11-30: Andy 0.3, Ben 0.8, Cat 0.5
@@ -40,29 +41,61 @@ export const useProjectStore = defineStore('projects', () => {
         barStyle.value = barStyle.value === 'block' ? 'arrow' : 'block'
     }
 
-    // 初始化：從 LocalStorage 或 默認值載入
+    // 初始化：從 workspaceStore 取得當前工作區內容
     function init() {
-        const saved = localStorage.getItem(STORAGE_KEY)
-        if (saved) {
-            rawText.value = saved
+        const workspaceStore = useWorkspaceStore()
+        workspaceStore.init()
+
+        // 監聽 workspace 變化
+        const { currentRawText } = storeToRefs(workspaceStore)
+
+        // 初始載入
+        loadFromWorkspace()
+
+        // 監聽切換
+        watch(currentRawText, () => {
+            loadFromWorkspace()
+        })
+    }
+
+    function loadFromWorkspace() {
+        const workspaceStore = useWorkspaceStore()
+        const ws = workspaceStore.currentWorkspace
+
+        if (ws) {
+            rawText.value = workspaceStore.currentRawText
+            // 解析時只取 content 部分（不含 frontmatter）
+            projects.value = parseText(ws.content)
         } else {
             rawText.value = DEFAULT_TEXT
+            projects.value = parseText(DEFAULT_TEXT)
         }
-        projects.value = parseText(rawText.value)
     }
 
     // 更新純文字並解析
     function updateText(text: string) {
         rawText.value = text
-        projects.value = parseText(text)
-        localStorage.setItem(STORAGE_KEY, text)
+
+        // 解析 frontmatter 和 content
+        const { content } = parseFrontmatter(text)
+        projects.value = parseText(content)
+
+        // 同步至 workspace store
+        const workspaceStore = useWorkspaceStore()
+        workspaceStore.updateCurrentRawText(text)
     }
 
     // 更新專案列表並序列化
     function updateProjects(newProjects: Project[]) {
         projects.value = newProjects
-        rawText.value = serializeToText(newProjects)
-        localStorage.setItem(STORAGE_KEY, rawText.value)
+        const serializedContent = serializeToText(newProjects)
+
+        // 只更新 content 部分
+        const workspaceStore = useWorkspaceStore()
+        workspaceStore.updateCurrentContent(serializedContent)
+
+        // 重新取得完整 rawText
+        rawText.value = workspaceStore.currentRawText
     }
 
     // 縮放控制

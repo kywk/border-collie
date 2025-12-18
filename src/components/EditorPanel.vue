@@ -4,6 +4,7 @@ import { useProjectStore } from '@/stores/projectStore'
 import { encodeData } from '@/utils/sharing'
 import TextEditor from './TextEditor.vue'
 import TableEditor from './TableEditor.vue'
+import WorkspaceDropdown from './WorkspaceDropdown.vue'
 
 type EditorMode = 'text' | 'table'
 
@@ -34,7 +35,7 @@ async function copyShareLink() {
   <div class="panel editor-panel">
     <div class="panel-header">
       <div class="header-left">
-        <span class="brand-logo">🐕 BorderCollie</span>
+        <WorkspaceDropdown />
       </div>
       <div class="header-right">
         <div class="toggle-group">
