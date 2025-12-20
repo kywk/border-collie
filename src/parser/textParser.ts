@@ -32,10 +32,16 @@ export function parseText(text: string): Project[] {
             if (currentProject) {
                 projects.push(currentProject)
             }
-            // 開始新專案
+            // 開始新專案 - 檢查是否有 ", pending" 標記
+            const rawName = trimmedLine.slice(0, -1).trim()
+            const pendingMatch = rawName.match(/^(.+),\s*pending$/i)
+            const isPending = !!pendingMatch
+            const projectName = isPending ? pendingMatch[1].trim() : rawName
+
             currentProject = {
-                name: trimmedLine.slice(0, -1).trim(),
-                phases: []
+                name: projectName,
+                phases: [],
+                pending: isPending || undefined  // 只有 pending 時才設定
             }
             continue
         }

@@ -114,10 +114,14 @@ export const useProjectStore = defineStore('projects', () => {
     }
 
     // 計算屬性：所有階段 (含計算後的實際開始日期)
+    // 注意：只包含非 pending 的專案，pending 專案不顯示在甘特圖上
     const computedPhases = computed<ComputedPhase[]>(() => {
         const result: ComputedPhase[] = []
 
-        projects.value.forEach((project, projectIndex) => {
+        // 只處理非 pending 的專案
+        const activeProjects = projects.value.filter(p => !p.pending)
+
+        activeProjects.forEach((project, projectIndex) => {
             let previousEndDate: string | null = null
 
             project.phases.forEach((phase) => {

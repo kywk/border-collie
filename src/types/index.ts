@@ -20,6 +20,7 @@ export interface Phase {
 export interface Project {
     name: string
     phases: Phase[]
+    pending?: boolean  // 是否擱置 (不顯示在甘特圖上，不列入人力計算)
 }
 
 /** 解析後的計算階段資料 (包含實際日期) */

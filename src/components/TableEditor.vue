@@ -115,6 +115,13 @@ function removePhase(projectIndex: number, phaseIndex: number) {
   store.updateProjects(projects)
 }
 
+// 切換專案 pending 狀態
+function togglePending(projectIndex: number) {
+  const projects = [...store.projects]
+  projects[projectIndex].pending = !projects[projectIndex].pending
+  store.updateProjects(projects)
+}
+
 // 新增人員
 const newPersonName = ref('')
 function addPerson() {
@@ -164,7 +171,11 @@ function addPerson() {
         </thead>
         <tbody>
           <template v-for="(project, pIdx) in store.projects" :key="pIdx">
-            <tr v-for="(phase, phIdx) in project.phases" :key="`${pIdx}-${phIdx}`">
+            <tr 
+              v-for="(phase, phIdx) in project.phases" 
+              :key="`${pIdx}-${phIdx}`"
+              :class="{ 'is-pending': project.pending }"
+            >
               <!-- 專案名稱 (第一個階段時顯示) -->
               <td
                 v-if="phIdx === 0"
@@ -175,13 +186,28 @@ function addPerson() {
                   :value="project.name"
                   @change="e => updateProjectName(pIdx, (e.target as HTMLInputElement).value)"
                 />
-                <button
-                  class="btn-add-phase"
-                  @click="addPhase(pIdx)"
-                  title="新增階段"
-                >
-                  ＋
-                </button>
+                <div class="project-actions">
+                  <button
+                    class="btn-pending"
+                    :class="{ 'is-pending': project.pending }"
+                    @click="togglePending(pIdx)"
+                    :title="project.pending ? '恢復專案' : '擱置專案'"
+                  >
+                    <svg v-if="project.pending" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg v-else viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                    </svg>
+                  </button>
+                  <button
+                    class="btn-add-phase"
+                    @click="addPhase(pIdx)"
+                    title="新增階段"
+                  >
+                    ＋
+                  </button>
+                </div>
               </td>
               
               <!-- 階段名稱 -->
@@ -288,9 +314,6 @@ function addPerson() {
 }
 
 .btn-add-phase {
-  position: absolute;
-  bottom: 4px;
-  right: 4px;
   width: 20px;
   height: 20px;
   padding: 0;
@@ -364,5 +387,50 @@ function addPerson() {
 .btn-delete:hover {
   background: var(--color-error);
   color: white;
+}
+
+/* Pending state styles */
+.is-pending {
+  opacity: 0.5;
+}
+
+.is-pending td {
+  background: var(--color-bg-tertiary);
+}
+
+.project-actions {
+  display: flex;
+  gap: 4px;
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+}
+
+.btn-pending {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.7;
+  transition: all var(--transition-fast);
+}
+
+.btn-pending:hover {
+  opacity: 1;
+  background: var(--color-bg-secondary);
+}
+
+.btn-pending.is-pending {
+  background: var(--color-warning);
+  color: white;
+  border-color: var(--color-warning);
+  opacity: 1;
 }
 </style>

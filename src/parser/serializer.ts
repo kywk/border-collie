@@ -17,7 +17,8 @@ export function serializeToText(projects: Project[]): string {
  */
 function serializeProject(project: Project): string {
     const lines: string[] = []
-    lines.push(`${project.name}:`)
+    const pendingTag = project.pending ? ', pending' : ''
+    lines.push(`${project.name}${pendingTag}:`)
 
     for (const phase of project.phases) {
         lines.push(serializePhase(phase))
