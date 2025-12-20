@@ -30,3 +30,6 @@ test-results/
 
 # Gemini / Antigravity
 .gemini
+
+# Drafts (AI-generated implementation plans)
+idea/.drafts/

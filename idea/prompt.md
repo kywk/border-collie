@@ -1,6 +1,7 @@
 # BorderCollie - AI Coding Agent Prompt
 
 > 本文件為 AI Coding Agent 可直接引用的 prompt，描述 BorderCollie 專案的完整規格與設計決策。
+> 適用於讓另一個 AI Agent 生成雷同專案。
 
 ---
 
@@ -94,6 +95,7 @@ Staff Portal:
 - 若某階段開始日期為 `--`，和前一階段畫在同一列
 - 支援縮放功能，方便截圖貼簡報
 - **箭頭視圖**：可切換為箭頭樣式，視覺化階段流向
+- **隱藏/顯示**：可隱藏特定專案列，方便進行部分項目比較
 
 ### 人力甘特圖
 - 縱軸為人員，橫軸為時間
@@ -101,6 +103,14 @@ Staff Portal:
 - 相同專案不同階段，若時間不重疊，在同一列顯示
 - 線段顏色依投入百分比呈現濃淡（40% ~ 100%）
 - **工作負載警示**：超過 110% 紅色背景、少於 50% 綠色背景
+- **隱藏/顯示**：可隱藏特定人員列，方便進行部分項目比較
+
+### 隱藏/顯示功能
+- 每個專案/人員名稱前有 SVG 眼睛圖示按鈕
+- 點擊按鈕隱藏該列，專案/人員名稱加入頂部「已隱藏」chip 列表
+- 點擊 chip 可恢復顯示該項目
+- 「全部顯示」按鈕一鍵恢復所有隱藏項目
+- 專案甘特圖與人力甘特圖的隱藏狀態各自獨立管理
 
 ### 分享功能
 - URL `?data=compressed` 格式，LZ-String 壓縮編碼
@@ -117,6 +127,11 @@ Staff Portal:
 - 支援 `?gist=GIST_ID` URL 參數載入公開 Gist
 - Gist 專案顯示 🔗 標記，可一鍵 🔄 Refresh 重新載入
 - 自動儲存至本地工作區，保留 Gist ID 供同步
+
+### 匯出功能
+- 匯出為 PNG 圖片（使用 html-to-image）
+- 匯出為 SVG 向量圖
+- 匯出為 PowerPoint 簡報（使用 pptxgenjs）
 
 ---
 
@@ -142,6 +157,7 @@ Staff Portal:
 - **年度時間軸**：首月顯示完整年月，其他月份只顯示月，不同年度交替背景色
 - **微動畫**：按鈕 hover 浮起、Bar hover 放大、主題切換旋轉特效
 - **Pill 按鈕**：切換按鈕為膠囊形狀，active 狀態帶 glow
+- **隱藏按鈕**：淡紅色背景 SVG 眼睛圖示，hover 時顯示斜線表示隱藏動作
 
 ### 主題
 - 支援 Light / Dark 模式
@@ -157,8 +173,6 @@ Staff Portal:
 ---
 
 ## 已實現功能清單
-
-基於 git commit 歷程：
 
 1. ✅ 甘特圖核心、分享連結、UI 架構
 2. ✅ 主題增強、佈局優化、匯出功能（PNG/SVG/PPT）
@@ -180,6 +194,11 @@ Staff Portal:
     - `?gist=GIST_ID` URL 參數載入公開 Gist
     - Gist 專案 🔗 標記與 🔄 Refresh 按鈕
     - Gist Utility：fetchPublicGist, extractGistId, isValidGistId
+13. ✅ **甘特圖隱藏/顯示功能**：
+    - 專案/人員列隱藏按鈕（SVG 眼睛圖示）
+    - 頂部「已隱藏」chip 列表
+    - 一鍵「全部顯示」恢復隱藏項目
+    - 專案/人力甘特圖獨立管理隱藏狀態
 
 ---
 
@@ -188,6 +207,79 @@ Staff Portal:
 - [ ] Gist 寫入（需 OAuth）
 - [ ] 匯出/匯入 JSON 備份
 - [ ] 專案搜尋/過濾
+- [ ] 隱藏狀態持久化（localStorage）
+
+---
+
+## 專案結構
+
+```
+border-collie/
+├── src/
+│   ├── App.vue                         # 主應用元件
+│   ├── main.ts                         # 入口點
+│   ├── assets/
+│   │   └── main.css                    # 全域樣式與 CSS 變數
+│   ├── components/
+│   │   ├── SplitPane.vue               # 左右分割面板
+│   │   ├── EditorPanel.vue             # 編輯區面板
+│   │   ├── TextEditor.vue              # 純文字編輯器
+│   │   ├── TableEditor.vue             # 表格編輯器
+│   │   ├── GanttPanel.vue              # 甘特圖面板（含視圖切換）
+│   │   ├── ProjectGantt.vue            # 專案甘特圖
+│   │   ├── PersonGantt.vue             # 人力甘特圖
+│   │   ├── WorkspaceDropdown.vue       # 工作區下拉選單
+│   │   ├── ConflictDialog.vue          # 分享衝突對話框
+│   │   └── ConfirmDialog.vue           # 確認對話框
+│   ├── composables/
+│   │   └── useGanttScale.ts            # 甘特圖時間軸計算
+│   ├── parser/
+│   │   ├── textParser.ts               # 純文字解析邏輯
+│   │   └── frontmatterParser.ts        # Frontmatter 解析邏輯
+│   ├── stores/
+│   │   ├── projectStore.ts             # 專案狀態管理
+│   │   └── workspaceStore.ts           # 工作區狀態管理
+│   ├── types/
+│   │   └── index.ts                    # TypeScript 型別定義
+│   └── utils/
+│       ├── sharing.ts                  # URL 分享編碼/解碼
+│       ├── gist.ts                     # Gist API 工具
+│       └── exporter.ts                 # 匯出功能（PNG/SVG/PPT）
+├── public/
+├── assets/                             # 文件截圖
+├── idea/                               # 設計文件與 prompt
+├── index.html
+├── package.json
+├── tsconfig.json
+├── vite.config.ts
+└── README.md
+```
+
+---
+
+## 關鍵實作細節
+
+### 甘特圖時間軸計算（useGanttScale.ts）
+- 根據所有專案階段計算時間範圍（前後各加一個月）
+- 計算月份列表、總寬度、X 座標位置
+- 提供專案顏色漸層生成函數
+- 計算今日標記位置
+
+### 專案/人力甘特圖行分配
+- 若階段時間不重疊，優先放在同一行
+- 對於接續階段（startDate = `--`），優先與前一階段同行
+- 智慧分配減少畫面垂直空間使用
+
+### 隱藏/顯示狀態管理
+- 使用 `ref<Set<string>>` 追蹤已隱藏的專案/人員名稱
+- `toggleHide()` 切換隱藏狀態
+- `showAll()` 清空隱藏集合
+- 使用 `v-show` 而非 `v-if` 保留 DOM 結構
+
+### 工作區持久化
+- 每個工作區存為獨立 localStorage 項目
+- 工作區列表存為 `border-collie-workspaces` 索引
+- 自動遷移舊版單一 localStorage 資料
 
 ---
 
@@ -204,4 +296,3 @@ Staff Portal:
 - `src/components/ProjectGantt.vue` - 專案甘特圖
 - `src/components/PersonGantt.vue` - 人力甘特圖
 - `src/components/WorkspaceDropdown.vue` - 工作區下拉選單
-- `idea/workspace-prompt.md` - Workspace + Gist 功能 AI Prompt

@@ -8,6 +8,23 @@ import type { PersonAssignment } from '@/types'
 const store = useProjectStore()
 const { months, totalWidth, getXPosition, getWidth, getProjectGradient, getTodayPosition } = useGanttScale()
 
+// 隱藏狀態管理
+const hiddenPersons = ref<Set<string>>(new Set())
+
+function toggleHide(personName: string) {
+  const newSet = new Set(hiddenPersons.value)
+  if (newSet.has(personName)) {
+    newSet.delete(personName)
+  } else {
+    newSet.add(personName)
+  }
+  hiddenPersons.value = newSet
+}
+
+function showAll() {
+  hiddenPersons.value = new Set()
+}
+
 // Tooltip 狀態
 const tooltip = ref<{
   visible: boolean
@@ -237,6 +254,23 @@ function getOpacity(percentage: number): number {
 
 <template>
   <div class="person-gantt">
+    <!-- 已隱藏項目 Chip Bar -->
+    <div v-if="hiddenPersons.size > 0" class="hidden-items-bar">
+      <span class="hidden-label">已隱藏:</span>
+      <button 
+        v-for="name in hiddenPersons" 
+        :key="name" 
+        class="hidden-chip"
+        @click="toggleHide(name)"
+        :title="'點擊顯示 ' + name"
+      >
+        {{ name }} ✕
+      </button>
+      <button class="show-all-btn" @click="showAll">
+        全部顯示
+      </button>
+    </div>
+    
     <div class="gantt-container">
       <!-- 時間軸標題 -->
       <div class="gantt-header" :style="{ width: totalWidth + 140 + 'px' }">
@@ -268,6 +302,7 @@ function getOpacity(percentage: number): number {
       <div
         v-for="(personData, pIdx) in personRows"
         :key="personData.person"
+        v-show="!hiddenPersons.has(personData.person)"
         class="person-group"
         :class="{ 'alt-group': pIdx % 2 === 1 }"
       >
@@ -277,6 +312,17 @@ function getOpacity(percentage: number): number {
             class="gantt-label person-label"
             :style="{ height: personData.rows.length * store.scale.rowHeight + 'px' }"
           >
+            <button 
+              class="hide-toggle-btn" 
+              @click="toggleHide(personData.person)"
+              title="隱藏此人員"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+                <line x1="2" y1="2" x2="22" y2="22" class="hide-slash"/>
+              </svg>
+            </button>
             <span>{{ personData.person }}</span>
           </div>
           
@@ -383,6 +429,98 @@ function getOpacity(percentage: number): number {
   position: relative;
   height: 100%;
   overflow: auto;
+}
+
+/* Hidden Items Chip Bar */
+.hidden-items-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 400;
+}
+
+.hidden-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-right: 4px;
+}
+
+.hidden-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--color-bg-hover);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.hidden-chip:hover {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.show-all-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.show-all-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+  border-style: solid;
+}
+
+/* Hide Toggle Button */
+.hide-toggle-btn {
+  width: 22px;
+  height: 22px;
+  padding: 4px;
+  margin-right: 6px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.hide-toggle-btn:hover {
+  opacity: 1;
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.hide-toggle-btn .hide-slash {
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+}
+
+.hide-toggle-btn:hover .hide-slash {
+  opacity: 1;
 }
 
 .gantt-container {

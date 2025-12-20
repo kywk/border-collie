@@ -9,9 +9,12 @@ BorderCollie 是一個現代化、輕量級的專案管理與人力資源甘特�
 -   **雙視圖切換**：
     -   **專案甘特圖 (Project Gantt)**：以專案為核心，展示各階段時程與相依性。
     -   **人力甘特圖 (Person Gantt)**：以人員為核心，視覺化每位成員在不同專案間的投入狀況與工作負載。
--   **雙顯示模組**：
+-   **雙顯示模式**：
     -   **標準區塊 (Block)**：傳統甘特圖條塊。
     -   **箭頭樣式 (Arrow)**：專案流程視覺化，以箭頭表現階段順序，支援重疊與陰影效果，清楚呈現階段間的接續關係。
+-   **隱藏/顯示功能**：
+    -   可隱藏特定專案或人員列，方便進行部分項目比較。
+    -   頂部「已隱藏」chip 列表，點擊可恢復顯示，另有「全部顯示」按鈕。
 -   **純文字編輯 (Text-to-Gantt)**：使用簡單直覺的純文字語法快速定義專案、階段與人員指派。
 -   **精美現代 UI**：
     -   **Glassmorphism 設計**：毛玻璃面板標題，漸層背景與陰影效果。
@@ -38,6 +41,8 @@ BorderCollie 是一個現代化、輕量級的專案管理與人力資源甘特�
     -   一鍵 🔄 Refresh 重新載入 Gist 最新內容。
 -   **便捷分享**：
     -   內建 **分享連結** 功能，將甘特圖資料使用 LZ-String 壓縮編碼於 URL 中，無需後端即可分享。
+-   **匯出功能**：
+    -   支援匯出為 PNG、SVG 圖片或 PowerPoint 簡報。
 
 ![Light Mode](assets/Screenshot_Light.png)
 ![Person Gantt](assets/Screenshot_Person.png)
@@ -115,7 +120,7 @@ Frontmatter 位於檔案開頭，以 `---` 分隔符結束，用於定義工作�
 -   **Build Tool**: Vite
 -   **State Management**: Pinia
 -   **Styling**: Vanilla CSS (Variables & Scoped CSS)
--   **Utils**: `lz-string` (URL 壓縮編碼)
+-   **Utils**: `lz-string` (URL 壓縮編碼), `html-to-image` (圖片匯出), `pptxgenjs` (PPT 匯出)
 
 ## 📄 License
 
