@@ -6,6 +6,7 @@
 export interface Frontmatter {
     name: string                  // 必填：工作區名稱
     gist?: string                 // 選填：Gist ID
+    source?: string               // 選填：外部 URL 來源
     description?: string          // 選填：描述
     createdAt?: string            // 選填：建立時間
     [key: string]: unknown        // 其他欄位
@@ -32,10 +33,10 @@ const FRONTMATTER_DELIMITER = '---'
  */
 export function parseFrontmatter(text: string): ParsedDocument {
     const trimmedText = text.trim()
-    
+
     // 尋找 --- 分隔符
     const delimiterIndex = trimmedText.indexOf(FRONTMATTER_DELIMITER)
-    
+
     if (delimiterIndex === -1) {
         // 沒有 Frontmatter
         return {
@@ -43,13 +44,13 @@ export function parseFrontmatter(text: string): ParsedDocument {
             content: text
         }
     }
-    
+
     const frontmatterSection = trimmedText.slice(0, delimiterIndex).trim()
     const contentSection = trimmedText.slice(delimiterIndex + FRONTMATTER_DELIMITER.length).trim()
-    
+
     // 解析 Frontmatter 欄位
     const frontmatter = parseFrontmatterFields(frontmatterSection)
-    
+
     if (!frontmatter || !frontmatter.name) {
         // Frontmatter 無效 (缺少必填的 name)
         return {
@@ -57,7 +58,7 @@ export function parseFrontmatter(text: string): ParsedDocument {
             content: text
         }
     }
-    
+
     return {
         frontmatter,
         content: contentSection
@@ -70,32 +71,32 @@ export function parseFrontmatter(text: string): ParsedDocument {
 function parseFrontmatterFields(text: string): Frontmatter | null {
     const lines = text.split('\n')
     const result: Record<string, unknown> = {}
-    
+
     for (const line of lines) {
         const trimmedLine = line.trim()
         if (!trimmedLine) continue
-        
+
         // 格式: key: value 或 key: "value"
         const colonIndex = trimmedLine.indexOf(':')
         if (colonIndex === -1) continue
-        
+
         const key = trimmedLine.slice(0, colonIndex).trim()
         let value: string = trimmedLine.slice(colonIndex + 1).trim()
-        
+
         // 移除引號
         if ((value.startsWith('"') && value.endsWith('"')) ||
             (value.startsWith("'") && value.endsWith("'"))) {
             value = value.slice(1, -1)
         }
-        
+
         result[key] = value
     }
-    
+
     // 驗證必填欄位
     if (!result.name || typeof result.name !== 'string') {
         return null
     }
-    
+
     return result as Frontmatter
 }
 
@@ -104,18 +105,18 @@ function parseFrontmatterFields(text: string): Frontmatter | null {
  */
 export function serializeFrontmatter(frontmatter: Frontmatter, content: string): string {
     const lines: string[] = []
-    
+
     // 標準欄位順序
-    const standardFields = ['name', 'gist', 'description', 'createdAt']
+    const standardFields = ['name', 'gist', 'source', 'description', 'createdAt']
     const customFields: string[] = []
-    
+
     // 分類欄位
     for (const key of Object.keys(frontmatter)) {
         if (!standardFields.includes(key)) {
             customFields.push(key)
         }
     }
-    
+
     // 序列化標準欄位
     for (const key of standardFields) {
         const value = frontmatter[key]
@@ -123,7 +124,7 @@ export function serializeFrontmatter(frontmatter: Frontmatter, content: string):
             lines.push(formatFrontmatterLine(key, value))
         }
     }
-    
+
     // 序列化自訂欄位
     for (const key of customFields) {
         const value = frontmatter[key]
@@ -131,12 +132,12 @@ export function serializeFrontmatter(frontmatter: Frontmatter, content: string):
             lines.push(formatFrontmatterLine(key, value))
         }
     }
-    
+
     // 組合
     if (lines.length === 0) {
         return content
     }
-    
+
     return `${lines.join('\n')}\n${FRONTMATTER_DELIMITER}\n${content}`
 }
 
@@ -168,14 +169,14 @@ export function generateUniqueName(baseName: string, existingNames: string[]): s
     if (!existingNames.includes(baseName)) {
         return baseName
     }
-    
+
     let counter = 1
     let newName = `${baseName} (${counter})`
-    
+
     while (existingNames.includes(newName)) {
         counter++
         newName = `${baseName} (${counter})`
     }
-    
+
     return newName
 }

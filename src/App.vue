@@ -21,6 +21,7 @@ function toggleTheme() {
 
 import { decodeData } from '@/utils/sharing'
 import { fetchPublicGist, extractGistId } from '@/utils/gist'
+import { decodeSourceUrl, fetchFromUrl, isValidSourceUrl } from '@/utils/urlSource'
 import { serializeFrontmatter, type Frontmatter } from '@/parser/frontmatterParser'
 
 // Conflict handling
@@ -98,13 +99,80 @@ async function loadFromGist(gistId: string) {
   return false
 }
 
+async function loadFromSource(base64Url: string) {
+  // Decode Base64 URL
+  const sourceUrl = decodeSourceUrl(base64Url)
+  
+  if (!sourceUrl) {
+    alert('無效的 URL 編碼格式')
+    return false
+  }
+  
+  if (!isValidSourceUrl(sourceUrl)) {
+    alert('無效的 URL 格式，僅支援 HTTP/HTTPS')
+    return false
+  }
+  
+  isLoading.value = true
+  loadingMessage.value = '正在載入外部資源...'
+  
+  try {
+    const result = await fetchFromUrl(sourceUrl)
+    
+    if (!result.success) {
+      alert(`載入失敗: ${result.error}\n\n來源 URL: ${sourceUrl}`)
+      return false
+    }
+    
+    if (result.content) {
+      // 確保 Frontmatter 包含 source URL
+      let contentToImport = result.content
+      
+      // 若原內容無 source 欄位，自動加入
+      if (!contentToImport.includes('source:')) {
+        const { frontmatter, content } = await import('@/parser/frontmatterParser')
+          .then(m => m.parseFrontmatter(result.content!))
+        
+        // 從 URL 提取檔名作為預設名稱
+        const urlPath = new URL(sourceUrl).pathname
+        const filename = urlPath.split('/').pop() || 'External Source'
+        const defaultName = filename.replace(/\.(md|txt)$/i, '')
+        
+        const newFrontmatter: Frontmatter = {
+          ...frontmatter,
+          name: frontmatter?.name ?? defaultName,
+          source: sourceUrl
+        }
+        contentToImport = serializeFrontmatter(newFrontmatter, content)
+      }
+      
+      // 匯入資料（處理衝突）
+      const importResult = workspaceStore.importSharedData(contentToImport)
+      
+      if (importResult.status === 'conflict') {
+        conflictName.value = importResult.conflictName ?? ''
+        pendingSharedData.value = contentToImport
+        showConflict.value = true
+      }
+      
+      return true
+    }
+  } finally {
+    isLoading.value = false
+    loadingMessage.value = ''
+  }
+  
+  return false
+}
+
 onMounted(async () => {
   const urlParams = new URLSearchParams(window.location.search)
   const sharedData = urlParams.get('data')
   const gistParam = urlParams.get('gist')
+  const sourceParam = urlParams.get('source')
   
   // Clean up URL
-  if (sharedData || gistParam) {
+  if (sharedData || gistParam || sourceParam) {
     const newUrl = window.location.pathname
     window.history.replaceState({}, '', newUrl)
   }
@@ -120,6 +188,10 @@ onMounted(async () => {
     } else {
       alert('無效的 Gist ID 格式')
     }
+    store.init()
+  } else if (sourceParam) {
+    // Handle ?source=BASE64_URL parameter
+    await loadFromSource(sourceParam)
     store.init()
   } else if (sharedData) {
     // Handle ?data=... parameter

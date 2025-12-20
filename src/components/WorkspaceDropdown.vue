@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import { useWorkspaceStore } from '@/stores/workspaceStore'
 import { fetchPublicGist } from '@/utils/gist'
+import { fetchFromUrl } from '@/utils/urlSource'
 import { parseFrontmatter, serializeFrontmatter, type Frontmatter } from '@/parser/frontmatterParser'
 import ConfirmDialog from './ConfirmDialog.vue'
 
@@ -94,6 +95,46 @@ async function refreshGist(ws: { id: string, frontmatter: Frontmatter, content: 
     }
 }
 
+async function refreshSource(ws: { id: string, frontmatter: Frontmatter, content: string }, e: Event) {
+    e.stopPropagation()
+    
+    const sourceUrl = ws.frontmatter.source
+    if (!sourceUrl) return
+    
+    isRefreshing.value = ws.id
+    
+    try {
+        const result = await fetchFromUrl(sourceUrl)
+        
+        if (!result.success) {
+            alert(`外部資源重新載入失敗: ${result.error}\n\n來源 URL: ${sourceUrl}`)
+            return
+        }
+        
+        if (result.content) {
+            // 解析外部內容
+            const { frontmatter: sourceFrontmatter, content: sourceContent } = parseFrontmatter(result.content)
+            
+            // 保留原有名稱和 source URL，但更新內容
+            const updatedFrontmatter: Frontmatter = {
+                ...sourceFrontmatter,
+                name: ws.frontmatter.name, // 保持本地名稱
+                source: sourceUrl
+            }
+            
+            // 更新當前工作區
+            workspaceStore.switchWorkspace(ws.id)
+            workspaceStore.updateCurrentRawText(
+                serializeFrontmatter(updatedFrontmatter, sourceContent)
+            )
+            
+            alert('已從外部來源重新載入內容！')
+        }
+    } finally {
+        isRefreshing.value = null
+    }
+}
+
 // Format date for display
 function formatDate(dateStr?: string): string {
     if (!dateStr) return ''
@@ -134,6 +175,7 @@ function formatDate(dateStr?: string): string {
                             <div class="workspace-name-row">
                                 <span class="workspace-name">{{ ws.frontmatter.name }}</span>
                                 <span v-if="ws.frontmatter.gist" class="gist-badge" title="連結至 Gist">🔗</span>
+                                <span v-else-if="ws.frontmatter.source" class="source-badge" title="外部來源">🔗</span>
                             </div>
                             <span v-if="ws.frontmatter.description" class="workspace-desc">
                                 {{ ws.frontmatter.description }}
@@ -149,6 +191,16 @@ function formatDate(dateStr?: string): string {
                                 :class="{ refreshing: isRefreshing === ws.id }"
                                 @click="refreshGist(ws, $event)"
                                 title="從 Gist 重新載入"
+                                :disabled="isRefreshing === ws.id"
+                            >
+                                🔄
+                            </button>
+                            <button 
+                                v-else-if="ws.frontmatter.source"
+                                class="refresh-btn"
+                                :class="{ refreshing: isRefreshing === ws.id }"
+                                @click="refreshSource(ws, $event)"
+                                title="從外部來源重新載入"
                                 :disabled="isRefreshing === ws.id"
                             >
                                 🔄
@@ -297,7 +349,8 @@ function formatDate(dateStr?: string): string {
     text-overflow: ellipsis;
 }
 
-.gist-badge {
+.gist-badge,
+.source-badge {
     font-size: 0.75rem;
     opacity: 0.7;
 }

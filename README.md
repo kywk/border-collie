@@ -43,6 +43,10 @@ BorderCollie 是一個現代化、輕量級的專案管理與人力資源甘特�
     -   支援 `?gist=GIST_ID` URL 參數載入公開 Gist。
     -   自動儲存至本地工作區，Gist 專案顯示 🔗 標記。
     -   一鍵 🔄 Refresh 重新載入 Gist 最新內容。
+-   **外部 URL 載入**：
+    -   支援 `?source=BASE64_URL` 參數載入外部專案資料。
+    -   適用於公司內網無法訪問 Gist 的情況。
+    -   同樣支援 🔗 標記與 🔄 Refresh 功能。
 -   **便捷分享**：
     -   內建 **分享連結** 功能，將甘特圖資料使用 LZ-String 壓縮編碼於 URL 中，無需後端即可分享。
 -   **匯出功能**：
@@ -119,6 +123,7 @@ Frontmatter 位於檔案開頭，以 `---` 分隔符結束，用於定義工作�
 |------|------|------|
 | `?data=` | LZ-String 壓縮分享連結 | `?data=NoIgJghg...` |
 | `?gist=` | 載入公開 Gist | `?gist=abc123def456...` |
+| `?source=` | Base64 編碼的外部 URL | `?source=aHR0cHM6Ly8...` |
 
 ## 🛠️ 技術架構
 

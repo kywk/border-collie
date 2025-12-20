@@ -2,6 +2,13 @@
 
 ---
 
+新增從某個網址取得專案資料功能，並自動填入編輯區.
+- URL/?source=base64, 網址透過 base64 url safe encode
+- 先把 base64 decode 後取得 URL, 再 fetch URL 資料
+- 其他處理機制比照 Gist 
+
+---
+
 新增專案 pendding 功能, 把某個專案完全從甘特圖上移除, 待完成後再加入甘特圖.
 - pendding 的專案仍留在編輯區, 但不在甘特圖上檢視, 亦不列入人力計算
 - 文字編輯區專案名稱後若有 "(, pendding)", 表示該專案被擱置 

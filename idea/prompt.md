@@ -132,6 +132,12 @@ Staff Portal:
 - Gist 專案顯示 🔗 標記，可一鍵 🔄 Refresh 重新載入
 - 自動儲存至本地工作區，保留 Gist ID 供同步
 
+### 外部 URL Source 支援
+- 支援 `?source=BASE64_URL` URL 參數載入外部資源
+- 適用於公司內網無法訪問 Gist 的情況
+- 同樣顯示 🔗 標記與 🔄 Refresh 按鈕
+- 自動儲存至本地工作區，保留 source URL 供同步
+
 ### 匯出功能
 - 匯出為 PNG 圖片（使用 html-to-image）
 - 匯出為 SVG 向量圖
@@ -208,6 +214,11 @@ Staff Portal:
     - 支援從人力負荷與甘特圖中排除
     - 表格編輯器支援並排的 Pending/AddPhase 按鈕佈局
     - 擱置專案提供視覺半透明反饋 (Opacity 0.5)
+15. ✅ **外部 URL Source 支援**：
+    - `?source=BASE64_URL` URL 參數載入外部資源
+    - Base64 URL-safe encode/decode 工具
+    - CORS 錯誤處理與 fallback 提示
+    - WorkspaceDropdown 顯示 🔗 與 🔄 Refresh
 
 ---
 
