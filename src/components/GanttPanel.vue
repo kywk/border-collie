@@ -115,8 +115,12 @@ async function handleExport(type: 'png' | 'svg' | 'ppt' | 'mermaid') {
       </div>
     </div>
     <div id="gantt-content" class="panel-content" @click="showExportMenu = false">
-      <ProjectGantt v-if="mode === 'project'" />
-      <PersonGantt v-else />
+      <KeepAlive>
+        <ProjectGantt v-if="mode === 'project'" />
+      </KeepAlive>
+      <KeepAlive>
+        <PersonGantt v-if="mode === 'person'" />
+      </KeepAlive>
     </div>
   </div>
 </template>

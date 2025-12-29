@@ -131,19 +131,45 @@ export function isMonthFormat(date: string): boolean {
 }
 
 /**
+ * 日期標準化快取 - 避免重複建立 Date 物件
+ */
+const dateCache = new Map<string, string>()
+
+/**
+ * 清除日期快取 (當資料更新時呼叫)
+ */
+export function clearDateCache(): void {
+    dateCache.clear()
+}
+
+/**
  * 標準化日期為完整日期格式
  * YYYY-MM -> YYYY-MM-01 (月初)
  * YYYY-MM-DD -> YYYY-MM-DD
  */
 export function normalizeDate(date: string, isEnd: boolean = false): string {
+    const cacheKey = `${date}:${isEnd}`
+
+    const cached = dateCache.get(cacheKey)
+    if (cached !== undefined) {
+        return cached
+    }
+
+    let result: string
     if (isMonthFormat(date)) {
         if (isEnd) {
             // 月末日期
             const [year, month] = date.split('-').map(Number)
             const lastDay = new Date(year, month, 0).getDate()
-            return `${date}-${String(lastDay).padStart(2, '0')}`
+            result = `${date}-${String(lastDay).padStart(2, '0')}`
+        } else {
+            result = `${date}-01`
         }
-        return `${date}-01`
+    } else {
+        result = date
     }
-    return date
+
+    dateCache.set(cacheKey, result)
+    return result
 }
+

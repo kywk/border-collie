@@ -5,11 +5,11 @@
  */
 
 import { defineStore, storeToRefs } from 'pinia'
-import { ref, computed, watch } from 'vue'
+import { ref, shallowRef, computed, watch } from 'vue'
 import type { Project, ComputedPhase, PersonAssignment, TimeRange, GanttScale } from '@/types'
 import { parseText } from '@/parser/textParser'
 import { serializeToText } from '@/parser/serializer'
-import { normalizeDate } from '@/parser/textParser'
+import { normalizeDate, clearDateCache } from '@/parser/textParser'
 import { useWorkspaceStore } from './workspaceStore'
 import { parseFrontmatter } from '@/parser/frontmatterParser'
 
@@ -28,7 +28,7 @@ Staff Portal:
 export const useProjectStore = defineStore('projects', () => {
     // State
     const rawText = ref('')
-    const projects = ref<Project[]>([])
+    const projects = shallowRef<Project[]>([])
     const scale = ref<GanttScale>({
         monthWidth: 60,
         rowHeight: 48
@@ -74,6 +74,7 @@ export const useProjectStore = defineStore('projects', () => {
 
     // 更新純文字並解析
     function updateText(text: string) {
+        clearDateCache()
         rawText.value = text
 
         // 解析 frontmatter 和 content
@@ -87,6 +88,7 @@ export const useProjectStore = defineStore('projects', () => {
 
     // 更新專案列表並序列化
     function updateProjects(newProjects: Project[]) {
+        clearDateCache()
         projects.value = newProjects
         const serializedContent = serializeToText(newProjects)
 
