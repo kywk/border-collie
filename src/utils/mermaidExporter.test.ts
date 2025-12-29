@@ -2,7 +2,7 @@
  * Mermaid Gantt Exporter - Unit Tests
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 // Since exportToMermaidGantt uses document APIs for download,
 // we'll test the core logic by creating a testable version
