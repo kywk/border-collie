@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useProjectStore } from '@/stores/projectStore'
-import { exportToImage, exportToPpt } from '@/utils/exporter'
+import { exportToImage, exportToPpt, exportToMermaidGantt } from '@/utils/exporter'
 import ProjectGantt from './ProjectGantt.vue'
 import PersonGantt from './PersonGantt.vue'
 
@@ -16,11 +16,13 @@ const store = useProjectStore()
 const mode = ref<GanttMode>('project')
 const showExportMenu = ref(false)
 
-async function handleExport(type: 'png' | 'svg' | 'ppt') {
+async function handleExport(type: 'png' | 'svg' | 'ppt' | 'mermaid') {
   showExportMenu.value = false
   
   if (type === 'ppt') {
     exportToPpt(mode.value, store)
+  } else if (type === 'mermaid') {
+    exportToMermaidGantt(store)
   } else {
     // Export DOM to image
     // Note: We target 'gantt-content' but need to be careful about scrolling
@@ -74,6 +76,7 @@ async function handleExport(type: 'png' | 'svg' | 'ppt') {
             <button class="dropdown-item" @click="handleExport('png')">匯出 PNG 圖片</button>
             <button class="dropdown-item" @click="handleExport('svg')">匯出 SVG 圖片</button>
             <button class="dropdown-item" @click="handleExport('ppt')">匯出 PowerPoint</button>
+            <button class="dropdown-item" @click="handleExport('mermaid')">匯出 Mermaid</button>
           </div>
         </div>
         

@@ -348,3 +348,60 @@ function getTimelineData(store: any) {
 
     return { startDate: minDate, endDate: maxDate, totalMonths, monthLabels }
 }
+
+/**
+ * Export Gantt data to Mermaid Gantt chart format
+ * Focuses on project schedules only (no manpower/resources)
+ * Uses computedPhases which already resolves '--' continuation dates
+ */
+export function exportToMermaidGantt(store: any, title?: string): void {
+    const lines: string[] = []
+    
+    // Header
+    lines.push('gantt')
+    lines.push('    dateFormat YYYY-MM-DD')
+    if (title) {
+        lines.push(`    title ${title}`)
+    }
+    lines.push('')
+
+    // Group phases by project
+    const phasesByProject = new Map<string, typeof store.computedPhases>()
+    
+    store.computedPhases.forEach((phase: any) => {
+        if (!phasesByProject.has(phase.projectName)) {
+            phasesByProject.set(phase.projectName, [])
+        }
+        phasesByProject.get(phase.projectName)!.push(phase)
+    })
+
+    // Generate sections for each project
+    phasesByProject.forEach((phases, projectName) => {
+        lines.push(`    section ${projectName}`)
+        
+        phases.forEach((phase: any) => {
+            // Normalize dates to YYYY-MM-DD format
+            const startDate = normalizeDate(phase.startDate)
+            const endDate = normalizeDate(phase.endDate, true)
+            
+            // Format: taskName :startDate, endDate
+            // Escape special characters in phase name if needed
+            const safePhaseName = phase.name.replace(/:/g, ' ')
+            lines.push(`    ${safePhaseName} :${startDate}, ${endDate}`)
+        })
+        
+        lines.push('')
+    })
+
+    const mermaidContent = lines.join('\n')
+
+    // Download as .mmd file
+    const blob = new Blob([mermaidContent], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.download = `border-collie-gantt.mmd`
+    link.href = url
+    link.click()
+    URL.revokeObjectURL(url)
+}
+
