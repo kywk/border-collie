@@ -1,6 +1,337 @@
 import { toPng, toSvg } from 'html-to-image'
 import PptxGenJS from 'pptxgenjs'
-import type { Project, PersonAssignment } from '@/types'
+import ExcelJS from 'exceljs'
+import type { Project, PersonAssignment, ComputedPhase } from '@/types'
+
+// ============================================================================
+// Excel Export
+// ============================================================================
+
+/**
+ * Export Gantt data to Excel (.xlsx)
+ * Creates two worksheets: ProjectGantt and PersonGantt
+ */
+export async function exportToExcel(store: any): Promise<void> {
+    const workbook = new ExcelJS.Workbook()
+    workbook.creator = 'BorderCollie'
+    workbook.created = new Date()
+
+    // Get timeline data
+    const { startDate, endDate, totalMonths, monthLabels } = getTimelineData(store)
+
+    // Create worksheets
+    createProjectGanttSheet(workbook, store, startDate, endDate, totalMonths, monthLabels)
+    createPersonGanttSheet(workbook, store, startDate, endDate, totalMonths, monthLabels)
+
+    // Generate and download
+    const buffer = await workbook.xlsx.writeBuffer()
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.download = 'border-collie-gantt.xlsx'
+    link.href = url
+    link.click()
+    URL.revokeObjectURL(url)
+}
+
+// Project colors (matching PPT export)
+const PROJECT_COLORS = ['60A5FA', '34D399', 'FBBF24', 'A78BFA', 'F472B6', '2DD4BF', 'FB923C', '818CF8']
+
+function createProjectGanttSheet(
+    workbook: ExcelJS.Workbook,
+    store: any,
+    startDate: Date,
+    _endDate: Date,
+    totalMonths: number,
+    monthLabels: string[]
+) {
+    const ws = workbook.addWorksheet('ProjectGantt')
+
+    // Column A for project/phase names
+    ws.getColumn(1).width = 25
+
+    // Set month column widths
+    for (let i = 0; i < totalMonths; i++) {
+        ws.getColumn(i + 2).width = 8
+    }
+
+    // Row 1: Year headers
+    let currentYear = 0
+    let yearStartCol = 2
+    monthLabels.forEach((label, idx) => {
+        const year = parseInt(label.split('-')[0])
+        if (year !== currentYear) {
+            if (currentYear !== 0) {
+                // Merge previous year cells
+                if (idx + 1 > yearStartCol) {
+                    ws.mergeCells(1, yearStartCol, 1, idx + 1)
+                }
+            }
+            yearStartCol = idx + 2
+            currentYear = year
+        }
+        ws.getCell(1, idx + 2).value = year
+    })
+    // Merge last year
+    if (totalMonths + 1 >= yearStartCol) {
+        ws.mergeCells(1, yearStartCol, 1, totalMonths + 1)
+    }
+
+    // Style year row
+    const yearRow = ws.getRow(1)
+    yearRow.height = 20
+    yearRow.eachCell((cell, colNumber) => {
+        if (colNumber > 1) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3B82F6' } }
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+            cell.alignment = { horizontal: 'center', vertical: 'middle' }
+        }
+    })
+
+    // Row 2: Month headers
+    monthLabels.forEach((label, idx) => {
+        const month = label.split('-')[1]
+        const cell = ws.getCell(2, idx + 2)
+        cell.value = parseInt(month) + '月'
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFF6FF' } }
+        cell.font = { size: 10 }
+        cell.alignment = { horizontal: 'center', vertical: 'middle' }
+        cell.border = { bottom: { style: 'thin', color: { argb: 'FFE2E8F0' } } }
+    })
+    ws.getRow(2).height = 18
+
+    // Freeze panes
+    ws.views = [{ state: 'frozen', xSplit: 1, ySplit: 2 }]
+
+    // Data rows
+    let currentRow = 3
+    store.projects.forEach((project: Project, pIdx: number) => {
+        if (project.pending) return
+
+        const color = PROJECT_COLORS[pIdx % PROJECT_COLORS.length]
+
+        // Get phases for this project from computedPhases
+        const projectPhases = store.computedPhases.filter(
+            (p: ComputedPhase) => p.projectName === project.name
+        )
+
+        // Pack phases into rows (non-overlapping)
+        const packedRows: ComputedPhase[][] = []
+        projectPhases.forEach((phase: ComputedPhase) => {
+            let placed = false
+            for (const row of packedRows) {
+                const overlap = row.some(p => {
+                    const s1 = new Date(normalizeDate(phase.startDate)).getTime()
+                    const e1 = new Date(normalizeDate(phase.endDate, true)).getTime()
+                    const s2 = new Date(normalizeDate(p.startDate)).getTime()
+                    const e2 = new Date(normalizeDate(p.endDate, true)).getTime()
+                    return s1 < e2 && s2 < e1
+                })
+                if (!overlap) {
+                    row.push(phase)
+                    placed = true
+                    break
+                }
+            }
+            if (!placed) packedRows.push([phase])
+        })
+
+        // Draw project name (spanning all its rows)
+        const startRow = currentRow
+        const rowCount = Math.max(1, packedRows.length)
+
+        // Merge project name cells
+        if (rowCount > 1) {
+            ws.mergeCells(startRow, 1, startRow + rowCount - 1, 1)
+        }
+        const nameCell = ws.getCell(startRow, 1)
+        nameCell.value = project.name
+        nameCell.font = { bold: true }
+        nameCell.alignment = { vertical: 'middle' }
+        nameCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } }
+
+        // Draw phases
+        packedRows.forEach((row, rIdx) => {
+            const rowNum = currentRow + rIdx
+
+            row.forEach(phase => {
+                const phaseStart = new Date(normalizeDate(phase.startDate))
+                const phaseEnd = new Date(normalizeDate(phase.endDate, true))
+
+                // Calculate column range
+                const startCol = getMonthColumn(startDate, phaseStart) + 2
+                const endCol = getMonthColumn(startDate, phaseEnd) + 2
+
+                if (startCol <= endCol && startCol >= 2) {
+                    // Merge cells for the phase
+                    if (endCol > startCol) {
+                        ws.mergeCells(rowNum, startCol, rowNum, endCol)
+                    }
+
+                    const cell = ws.getCell(rowNum, startCol)
+                    cell.value = phase.name
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + color } }
+                    cell.font = { color: { argb: 'FFFFFFFF' }, size: 9 }
+                    cell.alignment = { horizontal: 'center', vertical: 'middle' }
+                }
+            })
+
+            ws.getRow(rowNum).height = 22
+        })
+
+        currentRow += rowCount
+    })
+}
+
+function createPersonGanttSheet(
+    workbook: ExcelJS.Workbook,
+    store: any,
+    startDate: Date,
+    _endDate: Date,
+    totalMonths: number,
+    monthLabels: string[]
+) {
+    const ws = workbook.addWorksheet('PersonGantt')
+
+    // Column A for person/assignment names
+    ws.getColumn(1).width = 28
+
+    // Set month column widths
+    for (let i = 0; i < totalMonths; i++) {
+        ws.getColumn(i + 2).width = 6
+    }
+
+    // Row 1: Year headers (same as ProjectGantt)
+    let currentYear = 0
+    let yearStartCol = 2
+    monthLabels.forEach((label, idx) => {
+        const year = parseInt(label.split('-')[0])
+        if (year !== currentYear) {
+            if (currentYear !== 0 && idx + 1 > yearStartCol) {
+                ws.mergeCells(1, yearStartCol, 1, idx + 1)
+            }
+            yearStartCol = idx + 2
+            currentYear = year
+        }
+        ws.getCell(1, idx + 2).value = year
+    })
+    if (totalMonths + 1 >= yearStartCol) {
+        ws.mergeCells(1, yearStartCol, 1, totalMonths + 1)
+    }
+
+    const yearRow = ws.getRow(1)
+    yearRow.height = 20
+    yearRow.eachCell((cell, colNumber) => {
+        if (colNumber > 1) {
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF3B82F6' } }
+            cell.font = { bold: true, color: { argb: 'FFFFFFFF' } }
+            cell.alignment = { horizontal: 'center', vertical: 'middle' }
+        }
+    })
+
+    // Row 2: Month headers
+    monthLabels.forEach((label, idx) => {
+        const month = label.split('-')[1]
+        const cell = ws.getCell(2, idx + 2)
+        cell.value = parseInt(month) + '月'
+        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFEFF6FF' } }
+        cell.font = { size: 9 }
+        cell.alignment = { horizontal: 'center', vertical: 'middle' }
+    })
+    ws.getRow(2).height = 18
+
+    // Freeze panes
+    ws.views = [{ state: 'frozen', xSplit: 1, ySplit: 2 }]
+
+    // Data rows - group by person
+    let currentRow = 3
+
+    store.allPersons.forEach((person: string) => {
+        // Person name row with monthly load
+        const nameCell = ws.getCell(currentRow, 1)
+        nameCell.value = person
+        nameCell.font = { bold: true }
+        nameCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFF8FAFC' } }
+
+        // Calculate and display monthly load
+        const assignments = store.personAssignments.filter(
+            (a: PersonAssignment) => a.person === person
+        )
+
+        for (let monthIdx = 0; monthIdx < totalMonths; monthIdx++) {
+            const monthDate = new Date(startDate)
+            monthDate.setMonth(monthDate.getMonth() + monthIdx)
+            const monthStart = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1)
+            const monthEnd = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0)
+
+            // Sum load for this month
+            let monthLoad = 0
+            assignments.forEach((a: PersonAssignment) => {
+                const aStart = new Date(normalizeDate(a.startDate))
+                const aEnd = new Date(normalizeDate(a.endDate, true))
+                if (aStart <= monthEnd && aEnd >= monthStart) {
+                    monthLoad += a.percentage
+                }
+            })
+
+            const cell = ws.getCell(currentRow, monthIdx + 2)
+            if (monthLoad > 0) {
+                cell.value = Math.round(monthLoad * 10) / 10
+                cell.alignment = { horizontal: 'center', vertical: 'middle' }
+                cell.font = { size: 9, bold: true }
+
+                // Color based on load
+                if (monthLoad > 1.1) {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFEE2E2' } }
+                    cell.font = { size: 9, bold: true, color: { argb: 'FFDC2626' } }
+                } else if (monthLoad >= 0.5) {
+                    cell.font = { size: 9, bold: true, color: { argb: 'FF16A34A' } }
+                } else {
+                    cell.font = { size: 9, color: { argb: 'FF6B7280' } }
+                }
+            }
+        }
+
+        ws.getRow(currentRow).height = 20
+        currentRow++
+
+        // Assignment rows for this person
+        assignments.forEach((assignment: PersonAssignment) => {
+            const labelCell = ws.getCell(currentRow, 1)
+            labelCell.value = `  ${assignment.projectName} - ${assignment.phaseName}`
+            labelCell.font = { size: 9, color: { argb: 'FF6B7280' } }
+
+            const aStart = new Date(normalizeDate(assignment.startDate))
+            const aEnd = new Date(normalizeDate(assignment.endDate, true))
+
+            const startCol = getMonthColumn(startDate, aStart) + 2
+            const endCol = getMonthColumn(startDate, aEnd) + 2
+
+            if (startCol <= endCol && startCol >= 2) {
+                const color = PROJECT_COLORS[assignment.projectIndex % PROJECT_COLORS.length]
+
+                if (endCol > startCol) {
+                    ws.mergeCells(currentRow, startCol, currentRow, endCol)
+                }
+
+                const cell = ws.getCell(currentRow, startCol)
+                cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF' + color } }
+            }
+
+            ws.getRow(currentRow).height = 18
+            currentRow++
+        })
+
+        // Add empty row between persons
+        currentRow++
+    })
+}
+
+// Get month column index (0-based)
+function getMonthColumn(startDate: Date, targetDate: Date): number {
+    return (targetDate.getFullYear() - startDate.getFullYear()) * 12 +
+        (targetDate.getMonth() - startDate.getMonth())
+}
 
 /**
  * Export specific element to Image
@@ -356,7 +687,7 @@ function getTimelineData(store: any) {
  */
 export function exportToMermaidGantt(store: any, title?: string): void {
     const lines: string[] = []
-    
+
     // Header
     lines.push('gantt')
     lines.push('    dateFormat YYYY-MM-DD')
@@ -367,7 +698,7 @@ export function exportToMermaidGantt(store: any, title?: string): void {
 
     // Group phases by project
     const phasesByProject = new Map<string, typeof store.computedPhases>()
-    
+
     store.computedPhases.forEach((phase: any) => {
         if (!phasesByProject.has(phase.projectName)) {
             phasesByProject.set(phase.projectName, [])
@@ -378,18 +709,18 @@ export function exportToMermaidGantt(store: any, title?: string): void {
     // Generate sections for each project
     phasesByProject.forEach((phases, projectName) => {
         lines.push(`    section ${projectName}`)
-        
+
         phases.forEach((phase: any) => {
             // Normalize dates to YYYY-MM-DD format
             const startDate = normalizeDate(phase.startDate)
             const endDate = normalizeDate(phase.endDate, true)
-            
+
             // Format: taskName :startDate, endDate
             // Escape special characters in phase name if needed
             const safePhaseName = phase.name.replace(/:/g, ' ')
             lines.push(`    ${safePhaseName} :${startDate}, ${endDate}`)
         })
-        
+
         lines.push('')
     })
 

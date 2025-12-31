@@ -51,6 +51,11 @@ BorderCollie 是一個現代化、輕量級的專案管理與人力資源甘特�
     -   內建 **分享連結** 功能，將甘特圖資料使用 LZ-String 壓縮編碼於 URL 中，無需後端即可分享。
 -   **匯出功能**：
     -   支援匯出為 PNG、SVG 圖片或 PowerPoint 簡報。
+-   **Excel VBA 版本**：
+    -   提供獨立的 Excel VBA 甘特圖工具，可離線使用。
+    -   支援與網頁版雙向匯入/匯出資料。
+    -   自動產生專案甘特圖與人力甘特圖。
+    -   人力負載警示 (紅/綠燈號)。
 
 ![Light Mode](assets/Screenshot_Light.png)
 ![Person Gantt](assets/Screenshot_Person.png)
@@ -124,6 +129,32 @@ Frontmatter 位於檔案開頭，以 `---` 分隔符結束，用於定義工作�
 | `?data=` | LZ-String 壓縮分享連結 | `?data=NoIgJghg...` |
 | `?gist=` | 載入公開 Gist | `?gist=abc123def456...` |
 | `?source=` | Base64 編碼的外部 URL | `?source=aHR0cHM6Ly8...` |
+## 📊 Excel VBA 版本
+
+除了網頁版，BorderCollie 也提供 Excel VBA 版本，適合離線使用或偏好 Excel 操作的使用者。
+
+### 功能特色
+
+-   **結構化表格輸入**：使用 Excel 表格輸入專案資料，無需學習純文字語法
+-   **自動產生甘特圖**：切換工作表時自動更新專案甘特圖與人力甘特圖
+-   **負載警示**：人力負載 > 110% 顯示紅色警示
+-   **雙向同步**：支援與網頁版匯入/匯出資料
+
+### 安裝方式
+
+詳細說明請參考 [excel/README.md](./excel/README.md)
+
+```
+excel/
+├── README.md         # 安裝與使用說明
+└── vba/              # VBA 模組原始碼
+    ├── ModConfig.bas
+    ├── ModDataParser.bas
+    ├── ModGanttRenderer.bas
+    ├── ModImportExport.bas
+    ├── ModMain.bas
+    └── ThisWorkbook.cls
+```
 
 ## 🛠️ 技術架構
 

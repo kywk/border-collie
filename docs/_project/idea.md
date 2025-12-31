@@ -62,7 +62,7 @@ Staff Portal:
 - 人力投入欄位不可編輯, 程式自動加總該階段所有投入人力
 
 前述範例示意如下圖
-![](./GuiEditor.png)
+![](../gantt-core/assets/gui-editor.png)
 
 
 ### 專案甘特圖檢視
@@ -73,7 +73,7 @@ Staff Portal:
 - 提供放大縮小, 可依月份跨距橫向縮放及縱向專案間距, 方便螢幕截圖貼到簡報
 
 前述範例示意如下圖
-![](./ProjectGantt.png)
+![](../gantt-core/assets/project-gantt.png)
 
 
 ### 人力甘特圖檢視
@@ -85,7 +85,7 @@ Staff Portal:
 - 甘特圖線段顏色依該人員/階段投入百分比層現濃淡區分, onMouseOver 顯示投入之百分比 
 
 前述範例示意如下圖, 僅以 Andy 為例
-![](./PersonGantt.png)
+![](../gantt-core/assets/person-gantt.png)
 
 
 ## 其他說明
