@@ -5,24 +5,25 @@
 ## 📁 目錄結構
 
 ```
-doc/
+docs/
 ├── _project/           # 專案層級文件
 ├── gantt-core/         # 甘特圖核心功能
 ├── workspace/          # Workspace 多專案管理
 ├── dual-layout/        # 雙欄佈局設計
-└── excel/              # Excel VBA 版本
+├── excel/              # Excel VBA 版本
+└── export-excel/       # Excel 匯出功能 (網頁版)
 ```
 
 ## 🗂️ 各目錄說明
 
 ### [_project/](./_project/)
-專案層級的通用文件，包括：
+專案層級的通用文件：
 - `idea.md` - 專案構想與目標
 - `changelog.md` - 功能變更紀錄
 - `ai-prompt.md` - 核心 AI 開發提示
 
 ### [gantt-core/](./gantt-core/)
-甘特圖核心功能的設計資料：
+甘特圖核心功能：
 - `assets/` - 設計截圖與示意圖
 
 ### [workspace/](./workspace/)
@@ -31,11 +32,17 @@ Workspace 多專案管理功能：
 - `ai-prompt.md` - AI 開發提示
 
 ### [dual-layout/](./dual-layout/)
-雙欄佈局（左編輯、右預覽）設計模式：
+雙欄佈局設計模式：
 - `ai-prompt.md` - 可重用的佈局設計 AI 提示
 
 ### [excel/](./excel/)
-Excel VBA 甘特圖工具：
+Excel VBA 甘特圖工具（獨立 Excel 檔案）：
+- `spec.md` - 需求規格
+- `implementation-plan.md` - 實作計畫
+- `ai-prompt.md` - AI 開發提示
+
+### [export-excel/](./export-excel/)
+Excel 匯出功能（網頁版匯出）：
 - `spec.md` - 需求規格
 - `implementation-plan.md` - 實作計畫
 - `ai-prompt.md` - AI 開發提示
